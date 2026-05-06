@@ -1,0 +1,15 @@
+models/
+db/
+db_probe/
+scripts/.venv/
+**/__pycache__/
+*.pyc
+.idea/
+scripts/.idea/
+data/tmp/
+*.db
+*.sqlite
+*.sqlite3
+*.sqlite3-journal
+.__codex_write_test.tmp
+__codex_probe__.tmp
