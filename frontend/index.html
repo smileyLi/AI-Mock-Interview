@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI面试系统 - Java后端开发工程师</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎯 AI模拟面试系统</h1>
+            <p>Java后端开发工程师岗位</p>
+        </header>
+
+        <div class="interview-panel">
+            <!-- 对话显示区域 -->
+            <div class="chat-area" id="chatArea">
+                <div class="message system">
+                    <span class="role">🤖 系统</span>
+                    <p>点击"开始面试"按钮开始模拟面试</p>
+                </div>
+            </div>
+
+            <!-- 控制按钮区域 -->
+            <div class="controls">
+                <button id="startBtn" class="btn btn-primary">🎤 开始面试</button>
+                <button id="recordBtn" class="btn btn-record" disabled>🎙️ 按住说话</button>
+                <button id="endBtn" class="btn btn-danger" disabled>✖️ 结束面试</button>
+                <button id="historyBtn" class="btn btn-secondary">📋 历史记录</button>
+            </div>
+
+            <!-- 状态提示 -->
+            <div class="status" id="status">
+                准备就绪，点击开始面试
+            </div>
+
+            <!-- 手动输入备用 -->
+            <div class="manual-input">
+                <input type="text" id="manualInput" placeholder="或者在这里输入文字..." disabled>
+                <button id="sendBtn" class="btn btn-secondary" disabled>发送</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 历史记录模态框 -->
+    <div id="historyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📋 面试历史记录</h2>
+                <span class="close">&times;</span>
+            </div>
+            <div class="modal-body" id="historyList">
+                <p class="empty-history">暂无面试记录</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 历史详情模态框 -->
+    <div id="historyDetailModal" class="modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2 id="detailTitle">面试详情</h2>
+                <span class="close-detail">&times;</span>
+            </div>
+            <div class="modal-body" id="historyDetail">
+            </div>
+            <div class="modal-footer">
+                <button id="deleteHistoryBtn" class="btn btn-danger">🗑️ 删除记录</button>
+                <button id="closeDetailBtn" class="btn btn-secondary">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api_client.js"></script>
+    <script src="js/audio_recorder.js"></script>
+    <script src="js/audio_player.js"></script>
+    <script src="js/app.js"></script>
+</body>
+</html>
