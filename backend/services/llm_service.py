@@ -5,24 +5,28 @@ from ..prompts.system_prompt import get_system_prompt
 
 class LLMService:
     """DeepSeek API服务（你原DeepSeekChat的核心逻辑）"""
-    
+
     def __init__(self):
         self.client = OpenAI(
             api_key=Config.DEEPSEEK_API_KEY,
             base_url=Config.DEEPSEEK_BASE_URL
         )
-    
-    def chat(self, history: List[Dict[str, str]], user_message: str) -> str:
+
+    def chat(self, history: List[Dict[str, str]], user_message: str, rag_context: str = "") -> str:
         """
         发送消息给LLM
         :param history: 历史消息列表
         :param user_message: 当前用户消息
+        :param rag_context: RAG检索到的参考知识（可选）
         :return: AI回复
         """
         try:
-            # 构建消息列表
+            system_content = get_system_prompt()
+            if rag_context:
+                system_content += f"\n\n【参考知识库】\n以下是与当前话题相关的知识，请基于这些内容进行追问和评估，不要直接念出知识库内容：\n{rag_context}"
+
             messages = [
-                {"role": "system", "content": get_system_prompt()}
+                {"role": "system", "content": system_content}
             ]
             messages.extend(history)
             messages.append({"role": "user", "content": user_message})

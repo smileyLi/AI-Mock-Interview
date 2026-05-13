@@ -2,6 +2,7 @@ from typing import Dict, Optional
 from ..models.session import InterviewSession
 from ..services.llm_service import LLMService
 from ..utils.history_manager import HistoryManager
+from ..rag.rag_service import RAGService
 import uuid
 from datetime import datetime
 
@@ -12,6 +13,11 @@ class InterviewService:
         self.llm_service = LLMService()
         self.sessions: Dict[str, InterviewSession] = {}
         self.history_manager = HistoryManager()
+        try:
+            self.rag_service = RAGService()
+        except Exception as e:
+            print(f"RAG服务初始化失败（将在无RAG模式下运行）: {e}")
+            self.rag_service = None
 
     def start_interview(self, session_id: Optional[str] = None) -> tuple[str, str]:
         """
@@ -48,7 +54,15 @@ class InterviewService:
 
         history = session.get_history_for_llm()
 
-        reply = self.llm_service.chat(history, user_message)
+        rag_context = ""
+        if self.rag_service:
+            try:
+                chunks = self.rag_service.query(user_message, n_results=4)
+                rag_context = self.rag_service.format_context(chunks)
+            except Exception as e:
+                print(f"RAG检索失败: {e}")
+
+        reply = self.llm_service.chat(history, user_message, rag_context)
 
         session.add_message("assistant", reply)
 
