@@ -20,3 +20,7 @@ models/
 # IDE
 .vscode/
 .idea/
+
+COPILOT.md
+embedding_model_install.bat
+data/web_frontend/.claude
