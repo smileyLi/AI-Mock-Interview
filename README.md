@@ -21,7 +21,7 @@ tokenizer_config.json
 vocab.txt
 全部下载，并存放到根目录的models/bge-small-zh-v1.5
 
-随后在根目录运行 python -m backend.rag.ingest 以加载RAG模型
+随后在根目录运行 python -m backend.rag.ingest 以把 Markdown 知识库文件变成可以快速搜索的向量数据库
 
 3.运行项目
 在根目录运行 python run.py 即可

@@ -1,0 +1,9 @@
+# 忽略根目录下的 models 文件夹
+/models/
+
+# 忽略整个 data 文件夹，但保留 interview_history.json
+/data/
+!/data/interview_history.json
+
+# 忽略所有 __pycache__ 文件夹
+__pycache__/
