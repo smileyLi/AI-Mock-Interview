@@ -9,7 +9,7 @@ from sentence_transformers import SentenceTransformer
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 CHROMA_DIR = ROOT / "data" / "chroma_db"
-COLLECTION_NAME = "java_backend"
+COLLECTION_NAME = "knowledge_base"
 EMBED_MODEL = str(ROOT / "models" / "bge-small-zh-v1.5")
 
 

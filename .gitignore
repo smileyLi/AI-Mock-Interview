@@ -23,4 +23,5 @@ models/
 
 COPILOT.md
 embedding_model_install.bat
-data/web_frontend/.claude
+data/test
+**/.claude
