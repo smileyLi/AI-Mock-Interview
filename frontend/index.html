@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI面试系统</title>
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <link rel="stylesheet" href="css/style.css?v=11">
+</head>
+<body>
+    <div class="app-container">
+        <!-- 侧边栏 -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2 class="sidebar-title">📋 面试记录</h2>
+                <button class="sidebar-toggle" id="sidebarToggle" title="收起侧边栏">
+                    <span></span>
+                </button>
+            </div>
+
+            <button class="new-interview-btn" id="newInterviewBtn">
+                <span class="btn-icon">✨</span>
+                <span class="btn-text">新的面试</span>
+            </button>
+
+            <div class="history-list" id="historyListSidebar">
+                <div class="history-empty" id="historyEmptySidebar">
+                    <p>暂无面试记录</p>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 侧边栏展开按钮（收起时显示） -->
+        <button class="sidebar-expand-btn" id="sidebarExpandBtn" title="展开历史记录">
+            <span>📋</span>
+        </button>
+
+        <!-- 主内容区 -->
+        <main class="main-content">
+            <header class="main-header">
+                <h1>🎯 AI模拟面试系统</h1>
+                <p id="jobTitle">Java后端开发工程师岗位</p>
+            </header>
+
+            <!-- 面试界面 -->
+            <div class="interview-panel" id="interviewPanel">
+                <!-- 对话显示区域 -->
+                <div class="chat-area" id="chatArea">
+                    <div class="message system">
+                        <span class="role">🤖 系统</span>
+                        <p>点击左侧「新的面试」开始模拟面试，或点击历史记录查看过往面试详情。</p>
+                    </div>
+                </div>
+
+                <!-- 控制按钮区域 -->
+                <div class="controls">
+                    <button id="startBtn" class="btn btn-primary">🎤 开始面试</button>
+                    <button id="recordBtn" class="btn btn-record" disabled>🎙️ 按住说话</button>
+                    <button id="endBtn" class="btn btn-danger" disabled>✖️ 结束面试</button>
+                    <button type="button" id="viewReportBtn" class="btn btn-primary btn-hidden" disabled>📄 查看面试报告</button>
+                </div>
+
+                <!-- 状态提示 -->
+                <div class="status" id="status">
+                    点击「开始面试」后将提示上传简历
+                </div>
+
+                <!-- 手动输入备用 -->
+                <div class="manual-input">
+                    <input type="text" id="manualInput" placeholder="或者在这里输入文字..." disabled>
+                    <button id="sendBtn" class="btn btn-secondary" disabled>发送</button>
+                </div>
+            </div>
+
+            <!-- 历史详情查看界面（初始隐藏） -->
+            <div class="detail-panel hidden" id="detailPanel">
+                <div class="detail-header">
+                    <button class="btn btn-danger" id="deleteHistoryBtnDetail">🗑️ 删除记录</button>
+                </div>
+
+                <div class="detail-content" id="detailContent">
+                    <!-- 历史详情将动态填充 -->
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 上传简历 → 开始面试 -->
+    <div id="resumeModal" class="modal">
+        <div class="modal-content modal-resume">
+            <div class="modal-header">
+                <h2>📎 上传简历</h2>
+                <span class="close-resume" title="关闭">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="resume-step-card resume-step-card--modal">
+                    <!-- 岗位选择 -->
+                    <div class="job-select-section" style="margin-bottom: 20px;">
+                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">选择面试岗位：</label>
+                        <select id="jobSelect" class="job-select" style="width: 100%; padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; cursor: pointer;">
+                            <option value="java_backend">☕ Java后端开发工程师</option>
+                            <option value="web_frontend">🎨 Web前端开发工程师</option>
+                        </select>
+                    </div>
+                    <!-- 简历上传 -->
+                    <p class="resume-step-desc">请选择 <strong>PDF</strong> 或 <strong>Word（.docx）</strong>。解析成功后可点击「确认并开始面试」。</p>
+                    <div class="resume-actions">
+                        <input type="file" id="resumeFileInput" class="resume-file-hidden" accept=".pdf,.doc,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                        <label for="resumeFileInput" class="btn btn-resume-pick">📎 点击选择简历文件</label>
+                        <span id="resumeHint" class="resume-hint">当前状态：未上传</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="resumeModalCancel" class="btn btn-secondary">取消</button>
+                <button type="button" id="resumeModalConfirm" class="btn btn-primary" disabled>确认并开始面试</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 面试总结报告 -->
+    <div id="summaryReportModal" class="modal">
+        <div class="modal-content modal-large modal-summary-report">
+            <div class="modal-header">
+                <h2>📄 面试总结报告</h2>
+                <span class="close-summary" title="关闭">&times;</span>
+            </div>
+            <div class="modal-body modal-body--report">
+                <div id="summaryReportBody" class="summary-report-body"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="summaryDownloadPdfBtn" class="btn btn-primary">下载 PDF</button>
+                <button type="button" id="summaryModalCloseBtn" class="btn btn-secondary">关闭</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 删除确认弹窗 -->
+    <div id="deleteConfirmModal" class="modal">
+        <div class="modal-content modal-delete">
+            <div class="modal-header">
+                <h2>🗑️ 确认删除</h2>
+                <span class="close-delete" title="关闭">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>确定要删除这条面试记录吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="deleteCancelBtn" class="btn btn-secondary">取消</button>
+                <button type="button" id="deleteConfirmBtn" class="btn btn-danger">确认删除</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
+    <script src="js/api_client.js?v=6"></script>
+    <script src="js/audio_recorder.js?v=5"></script>
+    <script src="js/audio_player.js?v=5"></script>
+    <script src="js/summary_report_render.js?v=5"></script>
+    <script src="js/app.js?v=9"></script>
+</body>
+</html>
