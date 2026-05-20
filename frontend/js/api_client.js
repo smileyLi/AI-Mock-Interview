@@ -60,16 +60,14 @@ class APIClient {
         return response.json();
     }
 
-    async startInterview(resumeText, jobRole = 'java_backend') {
-        // 空串会触发后端 min_length=1，返回 422
+    async startInterview(resumeText = '', jobRole = 'java_backend') {
         const text = typeof resumeText === 'string' ? resumeText.trim() : String(resumeText ?? '').trim();
-        if (!text) {
-            throw new Error('简历内容为空。请重新上传能复制出文字的 PDF 或 docx（图片型 PDF 无法识别）。');
-        }
         const data = { 
-            resume_text: text,
             job_role: jobRole 
         };
+        if (text) {
+            data.resume_text = text;
+        }
         if (this.sessionId != null && this.sessionId !== '') {
             data.session_id = String(this.sessionId);
         }
@@ -112,6 +110,29 @@ class APIClient {
 
     async deleteInterview(sessionId) {
         const result = await this.request(`/api/interview/history/${sessionId}`, 'DELETE');
+        return result;
+    }
+
+    async getResumeInfo() {
+        const result = await this.request('/api/interview/resume', 'GET');
+        return result;
+    }
+
+    async saveResume(text, filename = '') {
+        const url = `${this.baseURL}/api/interview/resume`;
+        const form = new FormData();
+        form.append('text', text);
+        form.append('filename', filename);
+        const response = await fetch(url, { method: 'POST', body: form });
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || `HTTP ${response.status}`);
+        }
+        return response.json();
+    }
+
+    async deleteResume() {
+        const result = await this.request('/api/interview/resume', 'DELETE');
         return result;
     }
 }

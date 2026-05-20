@@ -5,14 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI面试系统</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <link rel="stylesheet" href="css/style.css?v=11">
+    <link rel="stylesheet" href="css/style.css?v=12">
 </head>
 <body>
     <div class="app-container">
         <!-- 侧边栏 -->
         <aside class="sidebar" id="sidebar">
             <div class="sidebar-header">
-                <h2 class="sidebar-title">📋 面试记录</h2>
+                <h2 class="sidebar-title">📋 面试系统</h2>
                 <button class="sidebar-toggle" id="sidebarToggle" title="收起侧边栏">
                     <span></span>
                 </button>
@@ -22,6 +22,22 @@
                 <span class="btn-icon">✨</span>
                 <span class="btn-text">新的面试</span>
             </button>
+
+            <!-- 简历上传区域 -->
+            <div class="sidebar-resume-upload" id="resumeUploadArea">
+                <div class="sidebar-resume-header">
+                    <span class="sidebar-resume-title">📄 简历上传</span>
+                    <span id="resumeStatusText" class="sidebar-resume-status">未上传</span>
+                </div>
+                <div class="sidebar-resume-actions">
+                    <input type="file" id="resumeFileInput" class="resume-file-hidden" accept=".pdf,.doc,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                    <label for="resumeFileInput" class="btn btn-sidebar-resume">📎 上传简历</label>
+                    <button id="clearResumeBtn" class="btn btn-sm btn-outline btn-hidden">清除</button>
+                </div>
+                <div id="resumeHint" class="sidebar-resume-hint">支持 PDF、Word（.docx）</div>
+            </div>
+
+            <div class="sidebar-section-title">📜 面试历史</div>
 
             <div class="history-list" id="historyListSidebar">
                 <div class="history-empty" id="historyEmptySidebar">
@@ -52,9 +68,18 @@
                     </div>
                 </div>
 
+                <!-- 岗位选择区域 -->
+                <div class="job-select-area" id="jobSelectArea">
+                    <span class="job-select-label">选择面试岗位：</span>
+                    <select id="jobSelect" class="job-select">
+                        <option value="java_backend">☕ Java后端开发工程师</option>
+                        <option value="web_frontend">🎨 Web前端开发工程师</option>
+                    </select>
+                </div>
+
                 <!-- 控制按钮区域 -->
                 <div class="controls">
-                    <button id="startBtn" class="btn btn-primary">🎤 开始面试</button>
+                    <button id="startBtn" class="btn btn-primary btn-large">🎤 开始面试</button>
                     <button id="recordBtn" class="btn btn-record" disabled>🎙️ 按住说话</button>
                     <button id="endBtn" class="btn btn-danger" disabled>✖️ 结束面试</button>
                     <button type="button" id="viewReportBtn" class="btn btn-primary btn-hidden" disabled>📄 查看面试报告</button>
@@ -62,7 +87,7 @@
 
                 <!-- 状态提示 -->
                 <div class="status" id="status">
-                    点击「开始面试」后将提示上传简历
+                    选择岗位并上传简历（可选），然后点击「开始面试」
                 </div>
 
                 <!-- 手动输入备用 -->
@@ -85,38 +110,7 @@
         </main>
     </div>
 
-    <!-- 上传简历 → 开始面试 -->
-    <div id="resumeModal" class="modal">
-        <div class="modal-content modal-resume">
-            <div class="modal-header">
-                <h2>📎 上传简历</h2>
-                <span class="close-resume" title="关闭">&times;</span>
-            </div>
-            <div class="modal-body">
-                <div class="resume-step-card resume-step-card--modal">
-                    <!-- 岗位选择 -->
-                    <div class="job-select-section" style="margin-bottom: 20px;">
-                        <label style="display: block; margin-bottom: 8px; font-weight: 600;">选择面试岗位：</label>
-                        <select id="jobSelect" class="job-select" style="width: 100%; padding: 10px 15px; border: 2px solid #e0e0e0; border-radius: 8px; font-size: 16px; cursor: pointer;">
-                            <option value="java_backend">☕ Java后端开发工程师</option>
-                            <option value="web_frontend">🎨 Web前端开发工程师</option>
-                        </select>
-                    </div>
-                    <!-- 简历上传 -->
-                    <p class="resume-step-desc">请选择 <strong>PDF</strong> 或 <strong>Word（.docx）</strong>。解析成功后可点击「确认并开始面试」。</p>
-                    <div class="resume-actions">
-                        <input type="file" id="resumeFileInput" class="resume-file-hidden" accept=".pdf,.doc,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-                        <label for="resumeFileInput" class="btn btn-resume-pick">📎 点击选择简历文件</label>
-                        <span id="resumeHint" class="resume-hint">当前状态：未上传</span>
-                    </div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" id="resumeModalCancel" class="btn btn-secondary">取消</button>
-                <button type="button" id="resumeModalConfirm" class="btn btn-primary" disabled>确认并开始面试</button>
-            </div>
-        </div>
-    </div>
+    
 
     <!-- 面试总结报告 -->
     <div id="summaryReportModal" class="modal">
@@ -152,11 +146,28 @@
         </div>
     </div>
 
+    <!-- 清除简历确认弹窗 -->
+    <div id="clearResumeModal" class="modal">
+        <div class="modal-content modal-delete">
+            <div class="modal-header">
+                <h2>🗑️ 确认清除</h2>
+                <span class="close-clear-resume" title="关闭">&times;</span>
+            </div>
+            <div class="modal-body">
+                <p>确定要清除已保存的简历吗？</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" id="clearResumeCancelBtn" class="btn btn-secondary">取消</button>
+                <button type="button" id="clearResumeConfirmBtn" class="btn btn-danger">确认清除</button>
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="js/api_client.js?v=6"></script>
+    <script src="js/api_client.js?v=7"></script>
     <script src="js/audio_recorder.js?v=5"></script>
     <script src="js/audio_player.js?v=5"></script>
     <script src="js/summary_report_render.js?v=5"></script>
-    <script src="js/app.js?v=9"></script>
+    <script src="js/app.js?v=12"></script>
 </body>
 </html>

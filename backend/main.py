@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, UploadFile, File
+from fastapi import FastAPI, HTTPException, UploadFile, File, Form
 from fastapi.middleware.cors import CORSMiddleware
 from .config import Config
 from .services.interview_service import InterviewService
@@ -8,6 +8,7 @@ from .models.schemas import (
     EndInterviewRequest, EndInterviewResponse,
     InterviewListResponse, DeleteInterviewRequest, DeleteInterviewResponse,
     ParseResumeResponse,
+    ResumeInfoResponse, SaveResumeResponse,
 )
 from .utils.resume_parser import extract_text_from_upload
 
@@ -120,3 +121,39 @@ async def delete_interview(session_id: str):
             success=False,
             message="面试记录不存在"
         )
+
+
+@app.get("/api/interview/resume", response_model=ResumeInfoResponse)
+async def get_resume_info():
+    """获取保存的简历信息"""
+    saved = interview_service.load_saved_resume()
+    if saved:
+        return ResumeInfoResponse(
+            exists=True,
+            text=saved.get("text", ""),
+            filename=saved.get("filename", ""),
+            saved_at=saved.get("saved_at", ""),
+            char_count=saved.get("char_count", 0),
+        )
+    return ResumeInfoResponse(exists=False)
+
+
+@app.post("/api/interview/resume", response_model=SaveResumeResponse)
+async def save_resume(text: str = Form(...), filename: str = Form("")):
+    """保存简历到本地（解析后的文本）"""
+    if not text or not text.strip():
+        return SaveResumeResponse(success=False, message="简历内容不能为空")
+    
+    success = interview_service.save_resume(text.strip(), filename)
+    if success:
+        return SaveResumeResponse(success=True, message="简历保存成功")
+    return SaveResumeResponse(success=False, message="保存失败")
+
+
+@app.delete("/api/interview/resume", response_model=SaveResumeResponse)
+async def delete_resume():
+    """删除保存的简历"""
+    success = interview_service.delete_saved_resume()
+    if success:
+        return SaveResumeResponse(success=True, message="简历已删除")
+    return SaveResumeResponse(success=False, message="未找到保存的简历")

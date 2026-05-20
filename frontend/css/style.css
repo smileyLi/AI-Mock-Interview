@@ -396,6 +396,117 @@ body {
     text-align: center;
 }
 
+/* ==================== 侧边栏简历上传区域 ==================== */
+.sidebar-resume-upload {
+    margin: 12px 12px;
+    padding: 12px;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.sidebar-resume-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.sidebar-resume-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: #334155;
+}
+
+.sidebar-resume-status {
+    font-size: 11px;
+    color: #6b7280;
+}
+
+.sidebar-resume-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.btn-sidebar-resume {
+    flex: 1;
+    padding: 8px 10px;
+    font-size: 12px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+    color: white !important;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.2s ease;
+}
+
+.btn-sidebar-resume:hover {
+    filter: brightness(1.05);
+}
+
+.sidebar-resume-hint {
+    font-size: 10px;
+    color: #94a3b8;
+    text-align: center;
+}
+
+/* ==================== 岗位选择区域 ==================== */
+.job-select-area {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    padding: 12px 16px;
+    background: #f8fafc;
+    border-radius: 8px;
+    border: 1px solid #e2e8f0;
+}
+
+.job-select-label {
+    font-size: 13px;
+    font-weight: 500;
+    color: #475569;
+    white-space: nowrap;
+}
+
+.job-select {
+    flex: 1;
+    max-width: 280px;
+    padding: 8px 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    cursor: pointer;
+    background: white;
+    transition: all 0.2s ease;
+}
+
+.job-select:focus {
+    outline: none;
+    border-color: #667eea;
+    box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+/* ==================== 侧边栏区域标题 ==================== */
+.sidebar-section-title {
+    padding: 8px 16px;
+    font-size: 11px;
+    font-weight: 600;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+/* ==================== 开始面试按钮 ==================== */
+.btn-large {
+    padding: 12px 32px;
+    font-size: 16px;
+}
+
 /* ==================== 控制按钮 ==================== */
 .controls {
     display: flex;
@@ -482,6 +593,22 @@ body {
 
 .btn-hidden {
     display: none !important;
+}
+
+.btn-sm {
+    padding: 4px 10px;
+    font-size: 12px;
+}
+
+.btn-outline {
+    background: transparent;
+    color: #667eea;
+    border: 2px solid #667eea;
+}
+
+.btn-outline:hover:not(:disabled) {
+    background: #667eea;
+    color: white;
 }
 
 .status {

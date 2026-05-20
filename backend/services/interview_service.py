@@ -11,6 +11,7 @@ from ..rag.question_bank import sample_random_question_texts
 from ..rag.rag_service import RAGService
 from ..services.llm_service import LLMService
 from ..utils.history_manager import HistoryManager
+from ..utils.resume_manager import ResumeManager
 
 
 class InterviewService:
@@ -20,6 +21,7 @@ class InterviewService:
         self.llm_service = LLMService()
         self.sessions: Dict[str, InterviewSession] = {}
         self.history_manager = HistoryManager()
+        self.resume_manager = ResumeManager()
         self.rag_service: Optional[RAGService] = None
         if Config.RAG_ENABLED:
             try:
@@ -31,16 +33,10 @@ class InterviewService:
     def start_interview(
         self,
         session_id: Optional[str],
-        resume_text: str,
-        job_role: str = "java_backend"
+        resume_text: str = "",
+        job_role: str = "java_backend",
+        use_saved_resume: bool = True
     ) -> tuple[str, str]:
-        raw = (resume_text or "").strip()
-        if len(raw) < Config.RESUME_MIN_CHARS_TO_START:
-            raise ValueError(
-                f"简历有效内容过短（至少约 {Config.RESUME_MIN_CHARS_TO_START} 个字符），"
-                "请先上传 PDF 或 Word（docx）并解析成功后再开始"
-            )
-
         if job_role not in Config.SUPPORTED_JOB_ROLES:
             raise ValueError(
                 f"不支持的岗位类型: {job_role}。"
@@ -50,7 +46,14 @@ class InterviewService:
         if not session_id:
             session_id = str(uuid.uuid4())[:8]
 
-        stored = raw[: Config.RESUME_MAX_CHARS]
+        raw = (resume_text or "").strip()
+        
+        if not raw and use_saved_resume and Config.RESUME_STORAGE_ENABLED:
+            saved_resume = self.resume_manager.load_resume()
+            if saved_resume:
+                raw = saved_resume.get("text", "").strip()
+
+        stored = raw[: Config.RESUME_MAX_CHARS] if raw else ""
         session = InterviewSession(
             session_id=session_id,
             created_at=datetime.now(),
@@ -59,7 +62,7 @@ class InterviewService:
             job_role=job_role,
         )
 
-        resume_addon = build_resume_addon(stored)
+        resume_addon = build_resume_addon(stored) if stored else None
         first_question = self.llm_service.get_first_question(
             job_role=job_role,
             resume_addon=resume_addon
@@ -180,3 +183,27 @@ class InterviewService:
 
     def delete_interview(self, session_id: str) -> bool:
         return self.history_manager.delete_interview(session_id)
+
+    def save_resume(self, text: str, filename: str = "") -> bool:
+        """保存简历到本地"""
+        if Config.RESUME_STORAGE_ENABLED:
+            return self.resume_manager.save_resume(text, filename)
+        return False
+
+    def load_saved_resume(self):
+        """加载保存的简历"""
+        if Config.RESUME_STORAGE_ENABLED:
+            return self.resume_manager.load_resume()
+        return None
+
+    def delete_saved_resume(self) -> bool:
+        """删除保存的简历"""
+        if Config.RESUME_STORAGE_ENABLED:
+            return self.resume_manager.delete_resume()
+        return False
+
+    def has_saved_resume(self) -> bool:
+        """检查是否有保存的简历"""
+        if Config.RESUME_STORAGE_ENABLED:
+            return self.resume_manager.has_resume()
+        return False

@@ -76,5 +76,9 @@ class Config:
     # 简历上传
     RESUME_MAX_CHARS = int(os.getenv("RESUME_MAX_CHARS", "12000"))
     MAX_RESUME_UPLOAD_BYTES = int(os.getenv("MAX_RESUME_UPLOAD_BYTES", str(10 * 1024 * 1024)))
-    RESUME_MIN_CHARS_TO_START = int(os.getenv("RESUME_MIN_CHARS_TO_START", "20"))
+    RESUME_MIN_CHARS_TO_START = int(os.getenv("RESUME_MIN_CHARS_TO_START", "0"))  # 设为0表示可选上传
     RESUME_IN_BANK_PHASE = os.getenv("RESUME_IN_BANK_PHASE", "false").lower() in ("1", "true", "yes")
+    
+    # 简历持久化配置
+    RESUME_STORAGE_DIR = os.getenv("RESUME_STORAGE_DIR", str(DATA_DIR / "resumes"))
+    RESUME_STORAGE_ENABLED = os.getenv("RESUME_STORAGE_ENABLED", "true").lower() in ("1", "true", "yes")

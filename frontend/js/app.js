@@ -33,12 +33,8 @@ class InterviewApp {
         // 简历上传
         this.resumeFileInput = document.getElementById('resumeFileInput');
         this.resumeHint = document.getElementById('resumeHint');
-        this.resumeParsedText = '';
-        this.resumeReady = false;
-        this.resumeModal = document.getElementById('resumeModal');
-        this.resumeModalConfirm = document.getElementById('resumeModalConfirm');
-        this.resumeModalCancel = document.getElementById('resumeModalCancel');
-        this.closeResumeBtn = document.querySelector('.close-resume');
+        this.resumeStatusText = document.getElementById('resumeStatusText');
+        this.clearResumeBtn = document.getElementById('clearResumeBtn');
         this.jobSelect = document.getElementById('jobSelect');
 
         // 控制按钮
@@ -61,8 +57,19 @@ class InterviewApp {
         this.deleteConfirmBtn = document.getElementById('deleteConfirmBtn');
         this.closeDeleteBtn = document.querySelector('.close-delete');
 
+        // 清除简历确认弹窗
+        this.clearResumeModal = document.getElementById('clearResumeModal');
+        this.clearResumeCancelBtn = document.getElementById('clearResumeCancelBtn');
+        this.clearResumeConfirmBtn = document.getElementById('clearResumeConfirmBtn');
+        this.closeClearResumeBtn = document.querySelector('.close-clear-resume');
+
+        // 岗位选择区域
+        this.jobSelectArea = document.getElementById('jobSelectArea');
+
         this.init();
         this.loadHistoryToSidebar();
+        this.loadSavedResumeInfo();
+        this.showJobSelect();
     }
 
     // 岗位名称映射
@@ -97,9 +104,7 @@ class InterviewApp {
 
         // 简历上传
         this.resumeFileInput?.addEventListener('change', (e) => this.onResumeFileSelected(e));
-        this.resumeModalConfirm?.addEventListener('click', () => this.startInterview());
-        this.resumeModalCancel?.addEventListener('click', () => this.closeResumeModal());
-        this.closeResumeBtn?.addEventListener('click', () => this.closeResumeModal());
+        this.clearResumeBtn?.addEventListener('click', () => this.openClearResumeModal());
 
         // 岗位选择
         this.jobSelect?.addEventListener('change', () => {
@@ -131,6 +136,11 @@ class InterviewApp {
         this.deleteCancelBtn?.addEventListener('click', () => this.closeDeleteConfirmModal());
         this.deleteConfirmBtn?.addEventListener('click', () => this.confirmDelete());
         this.closeDeleteBtn?.addEventListener('click', () => this.closeDeleteConfirmModal());
+
+        // 清除简历确认弹窗
+        this.clearResumeCancelBtn?.addEventListener('click', () => this.closeClearResumeModal());
+        this.clearResumeConfirmBtn?.addEventListener('click', () => this.confirmClearResume());
+        this.closeClearResumeBtn?.addEventListener('click', () => this.closeClearResumeModal());
 
         // 语音和音频回调
         audioRecorder.onResult = (text) => this.handleUserInput(text);
@@ -202,7 +212,6 @@ class InterviewApp {
 
         this.historyListSidebar.innerHTML = html;
 
-        // 添加点击事件
         this.historyListSidebar.querySelectorAll('.history-item-sidebar').forEach(item => {
             item.addEventListener('click', (e) => {
                 if (e.target.classList.contains('history-item-sidebar-delete')) {
@@ -229,6 +238,9 @@ class InterviewApp {
             }
         }
         this.showInterviewPanel();
+        this.resetInterviewPanel();
+        this.showJobSelect();
+        this.updateStatus('选择岗位并上传简历（可选），然后点击「开始面试」');
     }
 
     // ==================== 面板切换 ====================
@@ -238,6 +250,26 @@ class InterviewApp {
         this.detailPanel.classList.add('hidden');
         this.currentDetailSessionId = null;
         this.loadHistoryToSidebar();
+    }
+
+    resetInterviewPanel() {
+        this.chatArea.innerHTML = '<div class="message system"><span class="role">🤖 系统</span><p>点击左侧「新的面试」开始模拟面试，或点击历史记录查看过往面试详情。</p></div>';
+        this.startBtn.disabled = false;
+        this.endBtn.disabled = true;
+        this.hideReportButton();
+        this.enableRecording(false);
+    }
+
+    showJobSelect() {
+        if (this.jobSelectArea) {
+            this.jobSelectArea.classList.remove('btn-hidden');
+        }
+    }
+
+    hideJobSelect() {
+        if (this.jobSelectArea) {
+            this.jobSelectArea.classList.add('btn-hidden');
+        }
     }
 
     async showHistoryDetail(sessionId) {
@@ -295,51 +327,10 @@ class InterviewApp {
 
     // ==================== 简历上传 ====================
 
-    openResumeModal() {
-        if (!this.resumeModal) return;
-
-        if (this.isInterviewActive) {
-            return;
-        }
-
-        this.resumeParsedText = '';
-        this.resumeReady = false;
-        
-        // 重置岗位选择
-        if (this.jobSelect) {
-            this.jobSelect.value = 'java_backend';
-            this.updateJobTitle('java_backend');
-        }
-        
-        if (this.resumeFileInput) {
-            this.resumeFileInput.value = '';
-            this.resumeFileInput.disabled = false;
-        }
-        if (this.resumeHint) {
-            this.resumeHint.textContent = '当前状态：未上传';
-        }
-        if (this.resumeModalConfirm) {
-            this.resumeModalConfirm.disabled = true;
-        }
-        this.resumeModal.style.display = 'block';
-        this.updateStatus('请选择简历文件');
-    }
-
-    closeResumeModal() {
-        if (this.resumeModal) {
-            this.resumeModal.style.display = 'none';
-        }
-    }
-
     async onResumeFileSelected(event) {
         const file = event.target?.files?.[0];
         if (!file) return;
 
-        this.resumeReady = false;
-        this.resumeParsedText = '';
-        if (this.resumeModalConfirm) {
-            this.resumeModalConfirm.disabled = true;
-        }
         if (this.resumeHint) {
             this.resumeHint.textContent = '解析中…';
         }
@@ -348,42 +339,31 @@ class InterviewApp {
         try {
             const result = await apiClient.parseResume(file);
             const raw = result.text != null ? String(result.text) : '';
-            this.resumeParsedText = raw.trim();
+            const text = raw.trim();
 
-            if (!this.resumeParsedText.length) {
-                this.resumeReady = false;
-                if (this.resumeModalConfirm) {
-                    this.resumeModalConfirm.disabled = true;
-                }
+            if (!text) {
                 if (this.resumeHint) {
                     this.resumeHint.textContent = '未提取到文字（常见于扫描版 PDF）';
                 }
-                this.updateStatus(
-                    '文件中未识别到文字，请换用可复制文本的 PDF 或 docx',
-                    'error'
-                );
+                this.updateStatus('文件中未识别到文字，请换用可复制文本的 PDF 或 docx', 'error');
                 return;
             }
 
-            this.resumeReady = true;
             const name = result.filename || file.name;
             const extra = result.truncated ? '（已截断过长文本）' : '';
+            
+            await this.saveResumeToServer(text, name);
+
             if (this.resumeHint) {
-                this.resumeHint.textContent = `已解析：${name}，约 ${this.resumeParsedText.length} 字${extra}`;
+                this.resumeHint.textContent = `${name}，约 ${text.length} 字${extra}`;
             }
-            if (this.resumeModalConfirm) {
-                this.resumeModalConfirm.disabled = false;
-            }
-            this.updateStatus('简历解析成功，请点击「确认并开始面试」');
+            this.updateStatus('简历上传成功！点击「开始面试」即可开始');
         } catch (error) {
             console.error('简历解析失败:', error);
             if (this.resumeHint) {
                 this.resumeHint.textContent = '解析失败，请使用 PDF 或 docx';
             }
-            this.updateStatus(
-                '简历解析失败：' + (error.message || '请检查格式与网络'),
-                'error'
-            );
+            this.updateStatus('简历解析失败：' + (error.message || '请检查格式与网络'), 'error');
         }
     }
 
@@ -393,12 +373,11 @@ class InterviewApp {
         if (this.isInterviewActive) {
             return;
         }
-        this.openResumeModal();
+        this.startInterview();
     }
 
     async startInterview() {
-        if (!this.resumeReady || !this.resumeParsedText || !this.resumeParsedText.trim()) {
-            this.updateStatus('请先上传 PDF 或 Word（docx）简历并成功解析', 'error');
+        if (this.isInterviewActive) {
             return;
         }
 
@@ -406,24 +385,18 @@ class InterviewApp {
         this.updateJobTitle(jobRole);
 
         this.updateStatus('正在开始面试...');
-        if (this.resumeModalConfirm) {
-            this.resumeModalConfirm.disabled = true;
-        }
+        this.startBtn.disabled = true;
 
         try {
-            const result = await apiClient.startInterview(this.resumeParsedText.trim(), jobRole);
+            const result = await apiClient.startInterview('', jobRole);
             this.currentSessionId = result.session_id;
             this.isInterviewActive = true;
 
-            this.closeResumeModal();
             this.showInterviewPanel();
+            this.hideJobSelect();
 
-            this.startBtn.disabled = true;
             this.endBtn.disabled = false;
-            if (this.resumeFileInput) {
-                this.resumeFileInput.disabled = true;
-            }
-            this.enableRecording(true);
+            this.enableRecording(false);
 
             this.hideReportButton();
             this.chatArea.innerHTML = '';
@@ -431,14 +404,12 @@ class InterviewApp {
             this.addMessage('assistant', result.first_question);
             audioPlayer.speak(result.first_question);
 
-            this.updateStatus('面试进行中...');
+            this.updateStatus('面试官正在说话，请稍等...');
 
         } catch (error) {
             console.error('开始面试失败:', error);
-            this.updateStatus('开始面试失败，请检查后端服务是否启动', 'error');
-            if (this.resumeModalConfirm && this.resumeReady) {
-                this.resumeModalConfirm.disabled = false;
-            }
+            this.updateStatus('开始面试失败：' + (error.message || '请检查后端服务'), 'error');
+            this.startBtn.disabled = false;
         }
     }
 
@@ -519,15 +490,8 @@ class InterviewApp {
             this.isInterviewActive = false;
             this.startBtn.disabled = false;
             this.currentSessionId = null;
-            this.resumeParsedText = '';
-            this.resumeReady = false;
-            if (this.resumeFileInput) {
-                this.resumeFileInput.value = '';
-                this.resumeFileInput.disabled = false;
-            }
-            if (this.resumeHint) {
-                this.resumeHint.textContent = '当前状态：未上传';
-            }
+
+            await this.loadSavedResumeInfo();
             this.updateStatus('面试已结束，可查看报告或开始新的面试');
             await this.loadHistoryToSidebar();
 
@@ -688,6 +652,36 @@ class InterviewApp {
         this.pendingDeleteSessionId = null;
     }
 
+    openClearResumeModal() {
+        if (this.clearResumeModal) {
+            this.clearResumeModal.style.display = 'block';
+        }
+    }
+
+    closeClearResumeModal() {
+        if (this.clearResumeModal) {
+            this.clearResumeModal.style.display = 'none';
+        }
+    }
+
+    async confirmClearResume() {
+        this.closeClearResumeModal();
+        try {
+            await apiClient.deleteResume();
+            await this.loadSavedResumeInfo();
+            if (this.resumeHint) {
+                this.resumeHint.textContent = '支持 PDF、Word（.docx）';
+            }
+            if (this.resumeFileInput) {
+                this.resumeFileInput.value = '';
+            }
+            this.updateStatus('简历已清除', 'info');
+        } catch (error) {
+            console.error('清除简历失败:', error);
+            this.updateStatus('清除简历失败', 'error');
+        }
+    }
+
     async confirmDelete() {
         const sessionId = this.pendingDeleteSessionId;
         this.closeDeleteConfirmModal();
@@ -718,6 +712,54 @@ class InterviewApp {
         const hours = String(date.getHours()).padStart(2, '0');
         const minutes = String(date.getMinutes()).padStart(2, '0');
         return `${year}-${month}-${day} ${hours}:${minutes}`;
+    }
+
+    // ==================== 简历管理 ====================
+
+    async loadSavedResumeInfo() {
+        try {
+            const info = await apiClient.getResumeInfo();
+            this.updateResumeStatus(info);
+        } catch (error) {
+            console.error('加载保存的简历信息失败:', error);
+            this.updateResumeStatus(null);
+        }
+    }
+
+    async saveResumeToServer(text, filename = '') {
+        try {
+            await apiClient.saveResume(text, filename);
+            await this.loadSavedResumeInfo();
+        } catch (error) {
+            console.error('保存简历失败:', error);
+            throw error;
+        }
+    }
+
+    
+
+    updateResumeStatus(info) {
+        if (!this.resumeStatusText) return;
+
+        if (info && info.exists) {
+            const name = info.filename || '简历';
+            const count = info.char_count || 0;
+            this.resumeStatusText.textContent = `${name}（${count}字）`;
+            this.resumeStatusText.style.color = '#10b981';
+            
+            if (this.clearResumeBtn) {
+                this.clearResumeBtn.classList.remove('btn-hidden');
+                this.clearResumeBtn.disabled = false;
+            }
+        } else {
+            this.resumeStatusText.textContent = '未上传';
+            this.resumeStatusText.style.color = '#6b7280';
+            
+            if (this.clearResumeBtn) {
+                this.clearResumeBtn.classList.add('btn-hidden');
+                this.clearResumeBtn.disabled = true;
+            }
+        }
     }
 }
 
