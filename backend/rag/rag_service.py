@@ -9,6 +9,7 @@ import chromadb
 from sentence_transformers import SentenceTransformer
 
 from ..config import Config
+from ..logger import get_logger
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 CHROMA_DIR = ROOT / "data" / "chroma_db"
@@ -26,11 +27,12 @@ class RAGService:
         return cls._instance
 
     def _init(self):
-        print("RAGService 初始化：加载 Embedding 模型...")
+        self.logger = get_logger(__name__)
+        self.logger.info("RAGService 初始化：加载 Embedding 模型...")
         self._model = SentenceTransformer(EMBED_MODEL)
         client = chromadb.PersistentClient(path=str(CHROMA_DIR))
         self._collection = client.get_collection(COLLECTION_NAME)
-        print(f"向量库已加载，共 {self._collection.count()} 条记录")
+        self.logger.info(f"向量库已加载，共 {self._collection.count()} 条记录")
 
     def query(
         self,

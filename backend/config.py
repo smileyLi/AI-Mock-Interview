@@ -11,15 +11,25 @@ _PROJECT_ROOT = _BACKEND_DIR.parent
 DATA_DIR = _PROJECT_ROOT / "data"
 _MODELS_BGE_ZH = _PROJECT_ROOT / "models" / "bge-small-zh-v1.5"
 
+
 class Config:
     # DeepSeek配置
-    DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "sk-2f81ce925baa46d38bda44602934fec8")
+    DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
     DEEPSEEK_BASE_URL = "https://api.deepseek.com/v1"
-    
+
+    # JWT配置
+    JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
+
+    # SMTP邮件配置
+    SMTP_HOST = os.getenv("SMTP_HOST", "smtp.qq.com")
+    SMTP_PORT = int(os.getenv("SMTP_PORT", "465"))
+    SMTP_USER = os.getenv("SMTP_USER", "")
+    SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
+
     # 服务器配置
     HOST = "127.0.0.1"
     PORT = 8000
-    
+
     # CORS配置（允许前端访问）
     ALLOWED_ORIGINS = [
         "http://127.0.0.1:8765",
@@ -29,7 +39,7 @@ class Config:
         "http://127.0.0.1:8000",
         "http://localhost:8000",
     ]
-    
+
     # 面试配置
     MAX_HISTORY = 10
     TEMPERATURE = 0.7
@@ -78,7 +88,8 @@ class Config:
     MAX_RESUME_UPLOAD_BYTES = int(os.getenv("MAX_RESUME_UPLOAD_BYTES", str(10 * 1024 * 1024)))
     RESUME_MIN_CHARS_TO_START = int(os.getenv("RESUME_MIN_CHARS_TO_START", "0"))  # 设为0表示可选上传
     RESUME_IN_BANK_PHASE = os.getenv("RESUME_IN_BANK_PHASE", "false").lower() in ("1", "true", "yes")
-    
+
     # 简历持久化配置
     RESUME_STORAGE_DIR = os.getenv("RESUME_STORAGE_DIR", str(DATA_DIR / "resumes"))
     RESUME_STORAGE_ENABLED = os.getenv("RESUME_STORAGE_ENABLED", "true").lower() in ("1", "true", "yes")
+

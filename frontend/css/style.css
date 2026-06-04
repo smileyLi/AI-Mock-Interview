@@ -8,16 +8,238 @@ html, body {
     height: 100%;
     width: 100%;
     overflow: hidden;
+    margin: 0;
+    padding: 0;
 }
 
 body {
     font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* ==================== 登录/注册界面 ==================== */
+.auth-panel {
+    width: 100%;
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    padding: 0;
-    margin: 0;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.auth-box {
+    background: white;
+    padding: 40px;
+    border-radius: 16px;
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    width: 100%;
+    max-width: 420px;
+}
+
+.auth-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1e293b;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.auth-form h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #334155;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-group label {
+    display: block;
+    font-size: 14px;
+    font-weight: 500;
+    color: #475569;
+    margin-bottom: 8px;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 15px;
+    transition: all 0.2s ease;
+    outline: none;
+}
+
+.form-group input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.password-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+    overflow: hidden;
+}
+
+.password-input-wrapper input {
+    padding-right: 40px;
+}
+
+.password-input-wrapper input::-ms-reveal,
+.password-input-wrapper input::-ms-clear {
+    display: none;
+}
+
+.password-toggle {
+    position: absolute;
+    right: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fff;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+    border-radius: 4px;
+}
+
+.password-input-wrapper.has-text .password-toggle {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.password-toggle:hover {
+    background: #f1f5f9;
+}
+
+.password-toggle:hover .eye-icon {
+    stroke: #475569;
+}
+
+.eye-icon {
+    display: block;
+    transition: stroke 0.2s ease;
+}
+
+.auth-switch {
+    margin-top: 16px;
+    text-align: center;
+    font-size: 14px;
+    color: #64748b;
+}
+
+.auth-switch a {
+    color: #6366f1;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-switch a:hover {
+    text-decoration: underline;
+}
+
+#toast-container {
+    position: fixed;
+    top: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    pointer-events: none;
+}
+
+.toast-message {
+    background: #ffffff;
+    color: #000000;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 500;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+    border: 1px solid #e2e8f0;
+    white-space: nowrap;
+    animation: toastIn 0.3s ease;
+    pointer-events: auto;
+}
+
+@keyframes toastIn {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.hidden {
+    display: none;
+}
+
+/* 用户信息区域 */
+.sidebar-user {
+    padding: 16px;
+    border-bottom: 1px solid #e2e8f0;
+    background: white;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.user-avatar {
+    width: 40px;
+    height: 40px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 20px;
+    color: white;
+}
+
+.user-details {
+    flex: 1;
+}
+
+.user-name {
+    font-weight: 600;
+    color: #1e293b;
+    font-size: 14px;
+}
+
+.btn-small {
+    padding: 6px 12px;
+    font-size: 13px;
+    border-radius: 6px;
+}
+
+.btn-outline {
+    background: transparent;
+    border: 1px solid #cbd5e1;
+    color: #475569;
+}
+
+.btn-outline:hover {
+    background: #f1f5f9;
 }
 
 /* ==================== 整体布局 ==================== */
@@ -30,6 +252,19 @@ body {
     position: relative;
 }
 
+/* 主应用容器 */
+.main-app {
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    display: flex;
+    position: relative;
+}
+
+.main-app.hidden {
+    display: none;
+}
+
 /* ==================== 侧边栏 ==================== */
 .sidebar {
     width: 280px;
@@ -38,18 +273,16 @@ body {
     border-right: 1px solid #e2e8f0;
     display: flex;
     flex-direction: column;
-    transition: width 0.3s ease;
+    transition: width 0.3s ease, margin-left 0.3s ease;
     overflow: hidden;
     flex-shrink: 0;
-    position: absolute;
-    left: 0;
-    top: 0;
     z-index: 10;
 }
 
 .sidebar.collapsed {
     width: 0;
     border-right: none;
+    margin-left: -280px;
 }
 
 .sidebar-header {
@@ -266,11 +499,13 @@ body {
     flex-direction: column;
     overflow: hidden;
     min-width: 0;
-    margin-left: 280px;
-    transition: margin-left 0.3s ease;
+    width: 100%;
+    height: 100%;
+    transition: margin-left 0.3s ease, width 0.3s ease;
 }
 
 .main-content.full-width {
+    width: 100%;
     margin-left: 0;
 }
 
@@ -579,6 +814,32 @@ body {
 
 .btn-secondary:hover:not(:disabled) {
     background: #218838;
+}
+
+.code-input-row {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.code-input-row input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+
+.code-input-row input:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.code-input-row .btn-secondary {
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .btn-small {

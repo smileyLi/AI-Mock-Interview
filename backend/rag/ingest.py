@@ -2,6 +2,7 @@
 构建向量知识库。
 运行方式：在项目根目录执行 python -m backend.rag.ingest
 """
+import logging
 import re
 import uuid
 from pathlib import Path
@@ -11,6 +12,13 @@ import chromadb
 from sentence_transformers import SentenceTransformer
 
 from ..config import Config
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s  %(levelname)-7s  %(message)s",
+    datefmt="%Y-%m-%d %H:%M:%S",
+)
+logger = logging.getLogger(__name__)
 
 ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_DIRS = [
@@ -123,7 +131,7 @@ def parse_file(path: Path) -> List[Tuple[str, str]]:
         except UnicodeDecodeError:
             continue
     else:
-        print(f"  [跳过] 无法解码：{path.name}")
+        logger.warning(f"跳过解码失败文件: {path.name}")
         return []
     text = strip_frontmatter(text)
 
@@ -142,7 +150,7 @@ def build_index():
     CHROMA_DIR.mkdir(parents=True, exist_ok=True)
 
     embed_model = Config.RAG_ST_MODEL_PATH
-    print(f"加载 Embedding 模型：{embed_model}")
+    logger.info(f"加载 Embedding 模型: {embed_model}")
     model = SentenceTransformer(embed_model)
 
     client = chromadb.PersistentClient(path=str(CHROMA_DIR))
@@ -150,7 +158,7 @@ def build_index():
     existing = [c.name for c in client.list_collections()]
     if COLLECTION_NAME in existing:
         client.delete_collection(COLLECTION_NAME)
-        print("已清除旧向量库，重新构建")
+        logger.info("已清除旧向量库，重新构建")
 
     collection = client.create_collection(
         name=COLLECTION_NAME,
@@ -161,7 +169,7 @@ def build_index():
 
     for data_dir, domain in DATA_DIRS:
         md_files = list(data_dir.rglob("*.md")) + list(data_dir.rglob("*.MD"))
-        print(f"\n[{domain}] 共发现 {len(md_files)} 个 Markdown 文件")
+        logger.info(f"[{domain}] 发现 {len(md_files)} 个 Markdown 文件")
 
         for md_path in md_files:
             category_dir = md_path.parent.name
@@ -188,9 +196,9 @@ def build_index():
 
                 all_metas.append(meta)
 
-            print(f"  {category_label}/{filename}  →  {len(chunks)} 块")
+            logger.info(f"  {category_label}/{filename} -> {len(chunks)} 块")
 
-    print(f"\n共 {len(all_texts)} 个 chunk，开始向量化...")
+    logger.info(f"共 {len(all_texts)} 个 chunk，开始向量化...")
     embeddings = model.encode(all_texts, show_progress_bar=True, batch_size=32)
 
     batch = 500
@@ -202,7 +210,7 @@ def build_index():
             metadatas=all_metas[start:start + batch],
         )
 
-    print(f"向量库构建完成，共写入 {len(all_texts)} 条，存储于：{CHROMA_DIR}")
+    logger.info(f"向量库构建完成，共写入 {len(all_texts)} 条，存储于: {CHROMA_DIR}")
 
 
 if __name__ == "__main__":

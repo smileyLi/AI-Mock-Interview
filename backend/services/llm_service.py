@@ -2,6 +2,7 @@ from openai import OpenAI
 from typing import Dict, List, Optional
 
 from ..config import Config
+from ..logger import get_logger
 from ..prompts.system_prompt import (
     build_summary_resume_addon,
     get_interview_summary_system_prompt,
@@ -17,6 +18,7 @@ class LLMService:
             api_key=Config.DEEPSEEK_API_KEY,
             base_url=Config.DEEPSEEK_BASE_URL,
         )
+        self.logger = get_logger(__name__)
 
     def chat(
         self,
@@ -55,7 +57,7 @@ class LLMService:
             )
             return response.choices[0].message.content or ""
         except Exception as e:
-            print(f"LLM API错误: {e}")
+            self.logger.error(f"LLM API错误: {e}")
             return "抱歉，我遇到了一些问题，请稍后重试。"
 
     def get_first_question(
@@ -105,5 +107,5 @@ class LLMService:
             )
             return response.choices[0].message.content or ""
         except Exception as e:
-            print(f"LLM 总结错误: {e}")
+            self.logger.error(f"LLM 总结错误: {e}")
             return "抱歉，生成面试总结时出现问题，请稍后重试。"

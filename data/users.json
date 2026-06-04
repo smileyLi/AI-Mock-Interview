@@ -1,0 +1,16 @@
+{
+  "smileyLi": {
+    "user_id": "cd77cdb5-abc8-4c24-b2d8-a528737481e7",
+    "username": "smileyLi",
+    "email": "2075245974@qq.com",
+    "password_hash": "$2b$12$shVAlrza1gStL2C3mAaiCe6kVG/JJejjyYV9kSMoHvmnEOqEX8PrO",
+    "created_at": "2026-05-28T03:32:57.199979"
+  },
+  "000000": {
+    "user_id": "1914b3df-b423-4f19-8e28-0da348080fcc",
+    "username": "000000",
+    "email": "3760320502@qq.com",
+    "password_hash": "$2b$12$FEa.ydQCs7AirHl06aVDeuYR9vx9wxtdtg7AoGFT2.PN4LuRQ6pcK",
+    "created_at": "2026-05-28T03:34:28.493048"
+  }
+}

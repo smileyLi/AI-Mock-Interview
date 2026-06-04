@@ -5,11 +5,17 @@ models/
 # Chroma 向量数据库（构建后生成，体积大）
 data/chroma_db/
 
+# 用户上传的个人简历
+data/resumes/
+
 # =============== 个人数据 ===============
 # 示例简历（可选，个人文件）
 data/*.docx
 data/*.pdf
 data/*.doc
+
+# 环境变量（含API密钥、邮箱授权码等敏感信息）
+.env
 
 # =============== Python ===============
 __pycache__/

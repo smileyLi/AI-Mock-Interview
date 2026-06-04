@@ -5,132 +5,245 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AI面试系统</title>
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <link rel="stylesheet" href="css/style.css?v=12">
+    <link rel="stylesheet" href="css/style.css?v=20">
 </head>
 <body>
     <div class="app-container">
-        <!-- 侧边栏 -->
-        <aside class="sidebar" id="sidebar">
-            <div class="sidebar-header">
-                <h2 class="sidebar-title">📋 面试系统</h2>
-                <button class="sidebar-toggle" id="sidebarToggle" title="收起侧边栏">
-                    <span></span>
-                </button>
-            </div>
+        <!-- 登录/注册页面 -->
+        <div id="auth-panel" class="auth-panel hidden">
+            <div class="auth-box">
+                <h1 class="auth-title">🎯 AI模拟面试系统</h1>
+                
+                <!-- 登录表单 -->
+                <div id="login-form" class="auth-form">
+                    <h2>登录</h2>
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" id="login-username" placeholder="请输入用户名">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="login-password" placeholder="请输入密码">
+                            <button type="button" class="password-toggle" tabindex="-1">
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-large" id="login-btn">登录</button>
+                    <p class="auth-switch">没有账号？ <a href="#" id="switch-to-register">立即注册</a></p>
+                    <p class="auth-switch"><a href="#" id="switch-to-forgot">忘记密码？</a></p>
+                </div>
+                
+                <!-- 注册表单 -->
+                <div id="register-form" class="auth-form hidden">
+                    <h2>注册</h2>
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" id="register-username" placeholder="请输入用户名（至少3个字符）">
+                    </div>
+                    <div class="form-group">
+                        <label>邮箱</label>
+                        <div class="code-input-row">
+                            <input type="email" id="register-email" placeholder="请输入邮箱">
+                            <button class="btn btn-secondary" id="register-send-code-btn">发送验证码</button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>验证码</label>
+                        <input type="text" id="register-code" placeholder="请输入6位验证码" maxlength="6">
+                    </div>
+                    <div class="form-group">
+                        <label>密码</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="register-password" placeholder="请输入密码（至少6个字符）">
+                            <button type="button" class="password-toggle" tabindex="-1">
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-large" id="register-btn">注册</button>
+                    <p class="auth-switch">已有账号？ <a href="#" id="switch-to-login">立即登录</a></p>
+                </div>
 
-            <button class="new-interview-btn" id="newInterviewBtn">
-                <span class="btn-icon">✨</span>
-                <span class="btn-text">新的面试</span>
+                <!-- 忘记密码表单 -->
+                <div id="forgot-form" class="auth-form hidden">
+                    <h2>重置密码</h2>
+                    <div class="form-group">
+                        <label>用户名</label>
+                        <input type="text" id="forgot-username" placeholder="请输入用户名">
+                    </div>
+                    <div class="form-group">
+                        <label>注册邮箱</label>
+                        <input type="email" id="forgot-email" placeholder="请输入注册时使用的邮箱">
+                    </div>
+                    <div class="form-group">
+                        <label>新密码</label>
+                        <div class="password-input-wrapper">
+                            <input type="password" id="forgot-password" placeholder="请输入新密码（至少6个字符）">
+                            <button type="button" class="password-toggle" tabindex="-1">
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                                    <circle cx="12" cy="12" r="3"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>验证码</label>
+                        <div class="code-input-row">
+                            <input type="text" id="forgot-code" placeholder="请输入6位验证码" maxlength="6" style="flex:1;">
+                            <button class="btn btn-secondary" id="send-code-btn">发送验证码</button>
+                        </div>
+                    </div>
+                    <button class="btn btn-primary btn-large" id="reset-password-btn">重置密码</button>
+                    <p class="auth-switch"><a href="#" id="switch-to-login-from-forgot">返回登录</a></p>
+                </div>
+                
+                <div id="toast-container"></div>
+            </div>
+        </div>
+        
+        <!-- 面试主界面 -->
+        <div id="main-app" class="main-app hidden">
+            <!-- 侧边栏 -->
+            <aside class="sidebar" id="sidebar">
+                <div class="sidebar-header">
+                    <h2 class="sidebar-title">📋 面试系统</h2>
+                    <button class="sidebar-toggle" id="sidebar-toggle" title="收起侧边栏">
+                        <span></span>
+                    </button>
+                </div>
+
+                <div class="sidebar-user">
+                    <div class="user-info">
+                        <span class="user-avatar" id="user-avatar">👤</span>
+                        <div class="user-details">
+                            <p class="user-name" id="user-name">用户</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-small btn-outline" id="logout-btn">退出登录</button>
+                </div>
+
+                <button class="new-interview-btn" id="new-interview-btn">
+                    <span class="btn-icon">✨</span>
+                    <span class="btn-text">新的面试</span>
+                </button>
+
+                <!-- 简历上传区域 -->
+                <div class="sidebar-resume-upload" id="resume-upload-area">
+                    <div class="sidebar-resume-header">
+                        <span class="sidebar-resume-title">📄 简历上传</span>
+                        <span id="resume-status-text" class="sidebar-resume-status">未上传</span>
+                    </div>
+                    <div class="sidebar-resume-actions">
+                        <input type="file" id="resume-file-input" class="resume-file-hidden" accept=".pdf,.doc,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
+                        <label for="resume-file-input" class="btn btn-sidebar-resume">📎 上传简历</label>
+                        <button id="clear-resume-btn" class="btn btn-sm btn-outline btn-hidden">清除</button>
+                    </div>
+                    <div id="resume-hint" class="sidebar-resume-hint">支持 PDF、Word（.docx）</div>
+                </div>
+
+                <div class="sidebar-section-title">📜 面试历史</div>
+
+                <div class="history-list" id="history-list-sidebar">
+                    <div class="history-empty" id="history-empty-sidebar">
+                        <p>暂无面试记录</p>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- 侧边栏展开按钮（收起时显示） -->
+            <button class="sidebar-expand-btn" id="sidebar-expand-btn" title="展开历史记录">
+                <span>📋</span>
             </button>
 
-            <!-- 简历上传区域 -->
-            <div class="sidebar-resume-upload" id="resumeUploadArea">
-                <div class="sidebar-resume-header">
-                    <span class="sidebar-resume-title">📄 简历上传</span>
-                    <span id="resumeStatusText" class="sidebar-resume-status">未上传</span>
-                </div>
-                <div class="sidebar-resume-actions">
-                    <input type="file" id="resumeFileInput" class="resume-file-hidden" accept=".pdf,.doc,.docx,application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document">
-                    <label for="resumeFileInput" class="btn btn-sidebar-resume">📎 上传简历</label>
-                    <button id="clearResumeBtn" class="btn btn-sm btn-outline btn-hidden">清除</button>
-                </div>
-                <div id="resumeHint" class="sidebar-resume-hint">支持 PDF、Word（.docx）</div>
-            </div>
+            <!-- 主内容区 -->
+            <main class="main-content">
+                <header class="main-header">
+                    <h1>🎯 AI模拟面试系统</h1>
+                    <p id="job-title">Java后端开发工程师岗位</p>
+                </header>
 
-            <div class="sidebar-section-title">📜 面试历史</div>
+                <!-- 面试面板 -->
+                <div class="interview-panel" id="interview-panel">
+                    <!-- 对话显示区域 -->
+                    <div class="chat-area" id="chat-area">
+                        <div class="message system">
+                            <span class="role">🤖 系统</span>
+                            <p>点击左侧「新的面试」开始模拟面试，或点击历史记录查看过往面试详情。</p>
+                        </div>
+                    </div>
 
-            <div class="history-list" id="historyListSidebar">
-                <div class="history-empty" id="historyEmptySidebar">
-                    <p>暂无面试记录</p>
-                </div>
-            </div>
-        </aside>
+                    <!-- 岗位选择区域 -->
+                    <div class="job-select-area" id="job-select-area">
+                        <span class="job-select-label">选择面试岗位：</span>
+                        <select id="job-select" class="job-select">
+                            <option value="java_backend">☕ Java后端开发工程师</option>
+                            <option value="web_frontend">🎨 Web前端开发工程师</option>
+                        </select>
+                    </div>
 
-        <!-- 侧边栏展开按钮（收起时显示） -->
-        <button class="sidebar-expand-btn" id="sidebarExpandBtn" title="展开历史记录">
-            <span>📋</span>
-        </button>
+                    <!-- 控制按钮区域 -->
+                    <div class="controls">
+                        <button id="start-btn" class="btn btn-primary btn-large">🎤 开始面试</button>
+                        <button id="record-btn" class="btn btn-record" disabled>🎙️ 按住说话</button>
+                        <button id="end-btn" class="btn btn-danger" disabled>✖️ 结束面试</button>
+                        <button type="button" id="view-report-btn" class="btn btn-primary btn-hidden" disabled>📄 查看面试报告</button>
+                    </div>
 
-        <!-- 主内容区 -->
-        <main class="main-content">
-            <header class="main-header">
-                <h1>🎯 AI模拟面试系统</h1>
-                <p id="jobTitle">Java后端开发工程师岗位</p>
-            </header>
+                    <!-- 状态提示 -->
+                    <div class="status" id="status">
+                        选择岗位并上传简历（可选），然后点击「开始面试」
+                    </div>
 
-            <!-- 面试界面 -->
-            <div class="interview-panel" id="interviewPanel">
-                <!-- 对话显示区域 -->
-                <div class="chat-area" id="chatArea">
-                    <div class="message system">
-                        <span class="role">🤖 系统</span>
-                        <p>点击左侧「新的面试」开始模拟面试，或点击历史记录查看过往面试详情。</p>
+                    <!-- 手动输入备用 -->
+                    <div class="manual-input">
+                        <input type="text" id="manual-input" placeholder="或者在这里输入文字..." disabled>
+                        <button id="send-btn" class="btn btn-secondary" disabled>发送</button>
                     </div>
                 </div>
 
-                <!-- 岗位选择区域 -->
-                <div class="job-select-area" id="jobSelectArea">
-                    <span class="job-select-label">选择面试岗位：</span>
-                    <select id="jobSelect" class="job-select">
-                        <option value="java_backend">☕ Java后端开发工程师</option>
-                        <option value="web_frontend">🎨 Web前端开发工程师</option>
-                    </select>
-                </div>
+                <!-- 历史详情查看面板（初始隐藏） -->
+                <div class="detail-panel hidden" id="detail-panel">
+                    <div class="detail-header">
+                        <button class="btn btn-danger" id="delete-history-btn-detail">🗑️ 删除记录</button>
+                    </div>
 
-                <!-- 控制按钮区域 -->
-                <div class="controls">
-                    <button id="startBtn" class="btn btn-primary btn-large">🎤 开始面试</button>
-                    <button id="recordBtn" class="btn btn-record" disabled>🎙️ 按住说话</button>
-                    <button id="endBtn" class="btn btn-danger" disabled>✖️ 结束面试</button>
-                    <button type="button" id="viewReportBtn" class="btn btn-primary btn-hidden" disabled>📄 查看面试报告</button>
+                    <div class="detail-content" id="detail-content">
+                        <!-- 历史详情将动态填充 -->
+                    </div>
                 </div>
-
-                <!-- 状态提示 -->
-                <div class="status" id="status">
-                    选择岗位并上传简历（可选），然后点击「开始面试」
-                </div>
-
-                <!-- 手动输入备用 -->
-                <div class="manual-input">
-                    <input type="text" id="manualInput" placeholder="或者在这里输入文字..." disabled>
-                    <button id="sendBtn" class="btn btn-secondary" disabled>发送</button>
-                </div>
-            </div>
-
-            <!-- 历史详情查看界面（初始隐藏） -->
-            <div class="detail-panel hidden" id="detailPanel">
-                <div class="detail-header">
-                    <button class="btn btn-danger" id="deleteHistoryBtnDetail">🗑️ 删除记录</button>
-                </div>
-
-                <div class="detail-content" id="detailContent">
-                    <!-- 历史详情将动态填充 -->
-                </div>
-            </div>
-        </main>
+            </main>
+        </div>
     </div>
 
-    
 
     <!-- 面试总结报告 -->
-    <div id="summaryReportModal" class="modal">
+    <div id="summary-report-modal" class="modal">
         <div class="modal-content modal-large modal-summary-report">
             <div class="modal-header">
                 <h2>📄 面试总结报告</h2>
                 <span class="close-summary" title="关闭">&times;</span>
             </div>
             <div class="modal-body modal-body--report">
-                <div id="summaryReportBody" class="summary-report-body"></div>
+                <div id="summary-report-body" class="summary-report-body"></div>
             </div>
             <div class="modal-footer">
-                <button type="button" id="summaryDownloadPdfBtn" class="btn btn-primary">下载 PDF</button>
-                <button type="button" id="summaryModalCloseBtn" class="btn btn-secondary">关闭</button>
+                <button type="button" id="summary-download-pdf-btn" class="btn btn-primary">下载 PDF</button>
+                <button type="button" id="summary-modal-close-btn" class="btn btn-secondary">关闭</button>
             </div>
         </div>
     </div>
 
     <!-- 删除确认弹窗 -->
-    <div id="deleteConfirmModal" class="modal">
+    <div id="delete-confirm-modal" class="modal">
         <div class="modal-content modal-delete">
             <div class="modal-header">
                 <h2>🗑️ 确认删除</h2>
@@ -140,14 +253,14 @@
                 <p>确定要删除这条面试记录吗？</p>
             </div>
             <div class="modal-footer">
-                <button type="button" id="deleteCancelBtn" class="btn btn-secondary">取消</button>
-                <button type="button" id="deleteConfirmBtn" class="btn btn-danger">确认删除</button>
+                <button type="button" id="delete-cancel-btn" class="btn btn-secondary">取消</button>
+                <button type="button" id="delete-confirm-btn" class="btn btn-danger">确认删除</button>
             </div>
         </div>
     </div>
 
     <!-- 清除简历确认弹窗 -->
-    <div id="clearResumeModal" class="modal">
+    <div id="clear-resume-modal" class="modal">
         <div class="modal-content modal-delete">
             <div class="modal-header">
                 <h2>🗑️ 确认清除</h2>
@@ -157,17 +270,17 @@
                 <p>确定要清除已保存的简历吗？</p>
             </div>
             <div class="modal-footer">
-                <button type="button" id="clearResumeCancelBtn" class="btn btn-secondary">取消</button>
-                <button type="button" id="clearResumeConfirmBtn" class="btn btn-danger">确认清除</button>
+                <button type="button" id="clear-resume-cancel-btn" class="btn btn-secondary">取消</button>
+                <button type="button" id="clear-resume-confirm-btn" class="btn btn-danger">确认清除</button>
             </div>
         </div>
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" crossorigin="anonymous"></script>
-    <script src="js/api_client.js?v=7"></script>
+    <script src="js/api_client.js?v=15"></script>
     <script src="js/audio_recorder.js?v=5"></script>
     <script src="js/audio_player.js?v=5"></script>
     <script src="js/summary_report_render.js?v=5"></script>
-    <script src="js/app.js?v=12"></script>
+    <script src="js/app.js?v=22"></script>
 </body>
 </html>

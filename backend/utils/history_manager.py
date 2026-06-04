@@ -5,131 +5,89 @@ from pathlib import Path
 
 from ..config import DATA_DIR
 
+
 class HistoryManager:
-    """面试历史数据管理器"""
+    """面试历史数据管理器 - 支持多用户"""
 
     def __init__(self, data_dir: Optional[str] = None):
-        # 默认写入项目根目录 data/，与工作目录无关
         self.data_dir = Path(data_dir) if data_dir else DATA_DIR
         self.history_file = self.data_dir / "interview_history.json"
         self._ensure_data_dir()
         self._ensure_history_file()
 
     def _ensure_data_dir(self):
-        """确保数据目录存在"""
         self.data_dir.mkdir(parents=True, exist_ok=True)
 
     def _ensure_history_file(self):
-        """确保历史文件存在"""
         if not self.history_file.exists():
             self._save_history([])
 
     def _load_history(self) -> List[dict]:
-        """从文件加载历史记录"""
         try:
-            with open(self.history_file, 'r', encoding='utf-8') as f:
+            with open(self.history_file, "r", encoding="utf-8") as f:
                 return json.load(f)
         except (json.JSONDecodeError, FileNotFoundError):
             return []
 
     def _save_history(self, history: List[dict]):
-        """保存历史记录到文件"""
-        with open(self.history_file, 'w', encoding='utf-8') as f:
+        with open(self.history_file, "w", encoding="utf-8") as f:
             json.dump(history, f, ensure_ascii=False, indent=2)
 
-    def add_interview(self, session_id: str, messages: List[dict], summary: str = "", job_role: str = "java_backend") -> dict:
-        """
-        添加面试记录
-        :param session_id: 会话ID
-        :param messages: 消息列表
-        :param summary: 面试总结
-        :param job_role: 面试岗位
-        :return: 创建的面试记录
-        """
+    def add_interview(self, user_id: str, session_id: str, messages: List[dict], summary: str = "", job_role: str = "java_backend") -> dict:
         history = self._load_history()
-
         interview = {
+            "user_id": user_id,
             "session_id": session_id,
-            "created_at": datetime.now().isoformat(),
-            "updated_at": datetime.now().isoformat(),
+            "created_at": datetime.utcnow().isoformat(),
+            "updated_at": datetime.utcnow().isoformat(),
             "messages": messages,
             "summary": summary,
             "job_role": job_role
         }
-
         history.insert(0, interview)
         self._save_history(history)
-
         return interview
 
-    def update_interview(self, session_id: str, messages: List[dict], summary: str = "", job_role: Optional[str] = None):
-        """
-        更新面试记录
-        :param session_id: 会话ID
-        :param messages: 更新后的消息列表
-        :param summary: 面试总结
-        :param job_role: 面试岗位（可选）
-        """
+    def update_interview(self, user_id: str, session_id: str, messages: List[dict], summary: str = "", job_role: Optional[str] = None):
         history = self._load_history()
-
         for interview in history:
-            if interview["session_id"] == session_id:
+            if interview["session_id"] == session_id and interview["user_id"] == user_id:
                 interview["messages"] = messages
-                interview["updated_at"] = datetime.now().isoformat()
+                interview["updated_at"] = datetime.utcnow().isoformat()
                 if summary:
                     interview["summary"] = summary
                 if job_role:
                     interview["job_role"] = job_role
                 break
-
         self._save_history(history)
 
-    def get_interviews(self) -> List[dict]:
-        """
-        获取所有面试记录
-        :return: 按时间倒序排列的面试记录列表
-        """
+    def get_interviews(self, user_id: str) -> List[dict]:
         history = self._load_history()
-        # 向后兼容：如果旧记录没有 job_role，默认设置为 java_backend
-        for interview in history:
-            if "job_role" not in interview:
-                interview["job_role"] = "java_backend"
-        return history
+        user_interviews = []
+        for i in history:
+            if i.get("user_id") == user_id:
+                if "job_role" not in i:
+                    i["job_role"] = "java_backend"
+                user_interviews.append(i)
+        return user_interviews
 
-    def get_interview(self, session_id: str) -> Optional[dict]:
-        """
-        获取指定会话的面试记录
-        :param session_id: 会话ID
-        :return: 面试记录，如果不存在返回 None
-        """
+    def get_interview(self, user_id: str, session_id: str) -> Optional[dict]:
         history = self._load_history()
-
-        for interview in history:
-            if interview["session_id"] == session_id:
-                # 向后兼容
-                if "job_role" not in interview:
-                    interview["job_role"] = "java_backend"
-                return interview
-
+        for i in history:
+            if i.get("session_id") == session_id and i.get("user_id") == user_id:
+                if "job_role" not in i:
+                    i["job_role"] = "java_backend"
+                return i
         return None
 
-    def delete_interview(self, session_id: str) -> bool:
-        """
-        删除指定的面试记录
-        :param session_id: 会话ID
-        :return: 是否删除成功
-        """
+    def delete_interview(self, user_id: str, session_id: str) -> bool:
         history = self._load_history()
         original_length = len(history)
-
-        history = [i for i in history if i["session_id"] != session_id]
-
-        if len(history) < original_length:
-            self._save_history(history)
+        new_history = []
+        for i in history:
+            if not (i.get("session_id") == session_id and i.get("user_id") == user_id):
+                new_history.append(i)
+        if len(new_history) < original_length:
+            self._save_history(new_history)
             return True
-
         return False
-
-    def clear_all(self):
-        """清空所有面试记录"""
-        self._save_history([])
