@@ -15,7 +15,8 @@ _MODELS_BGE_ZH = _PROJECT_ROOT / "models" / "bge-small-zh-v1.5"
 class Config:
     # DeepSeek配置
     DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY")
-    DEEPSEEK_BASE_URL = "https://api.deepseek.com/v1"
+    DEEPSEEK_BASE_URL = os.getenv("DEEPSEEK_BASE_URL", "https://api.deepseek.com/v1")
+    LLM_MODEL = os.getenv("LLM_MODEL", "deepseek-chat")
 
     # JWT配置
     JWT_SECRET_KEY = os.getenv("JWT_SECRET_KEY")
@@ -27,11 +28,12 @@ class Config:
     SMTP_PASSWORD = os.getenv("SMTP_PASSWORD", "")
 
     # 服务器配置
-    HOST = "127.0.0.1"
-    PORT = 8000
+    HOST = os.getenv("HOST", "127.0.0.1")
+    PORT = int(os.getenv("PORT", "8000"))
 
     # CORS配置（允许前端访问）
-    ALLOWED_ORIGINS = [
+    # 部署时设置环境变量 ALLOWED_ORIGINS 用逗号分隔，如 "https://yourdomain.com,https://www.yourdomain.com"
+    _default_origins = [
         "http://127.0.0.1:8765",
         "http://localhost:8765",
         "http://127.0.0.1:5500",
@@ -39,6 +41,11 @@ class Config:
         "http://127.0.0.1:8000",
         "http://localhost:8000",
     ]
+    ALLOWED_ORIGINS = (
+        [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()]
+        if os.getenv("ALLOWED_ORIGINS")
+        else _default_origins
+    )
 
     # 面试配置
     MAX_HISTORY = 10

@@ -1,10 +1,20 @@
 class APIClient {
-    constructor(baseURL = 'http://127.0.0.1:8000') {
-        this.baseURL = baseURL;
+    constructor() {
+        this.baseURL = this._getBaseURL();
         this.sessionId = null;
         this.token = null;
         this.user = null;
         this.loadAuthState();
+    }
+
+    _getBaseURL() {
+        if (typeof window !== 'undefined' && window.location) {
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                return 'http://127.0.0.1:8000';
+            }
+            return window.location.origin + '/api';
+        }
+        return 'http://127.0.0.1:8000';
     }
 
     loadAuthState() {

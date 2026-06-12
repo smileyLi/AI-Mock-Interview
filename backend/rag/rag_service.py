@@ -11,11 +11,6 @@ from sentence_transformers import SentenceTransformer
 from ..config import Config
 from ..logger import get_logger
 
-ROOT = Path(__file__).resolve().parent.parent.parent
-CHROMA_DIR = ROOT / "data" / "chroma_db"
-COLLECTION_NAME = "knowledge_base"
-EMBED_MODEL = str(ROOT / "models" / "bge-small-zh-v1.5")
-
 
 class RAGService:
     _instance = None
@@ -29,9 +24,9 @@ class RAGService:
     def _init(self):
         self.logger = get_logger(__name__)
         self.logger.info("RAGService 初始化：加载 Embedding 模型...")
-        self._model = SentenceTransformer(EMBED_MODEL)
-        client = chromadb.PersistentClient(path=str(CHROMA_DIR))
-        self._collection = client.get_collection(COLLECTION_NAME)
+        self._model = SentenceTransformer(Config.EMBEDDING_MODEL)
+        client = chromadb.PersistentClient(path=Config.RAG_DB_DIR)
+        self._collection = client.get_collection(Config.RAG_COLLECTION)
         self.logger.info(f"向量库已加载，共 {self._collection.count()} 条记录")
 
     def query(

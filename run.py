@@ -21,14 +21,18 @@ logger = logging.getLogger(__name__)
 # 项目根目录（保证工作目录正确，且子进程 stdout 不使用 PIPE，避免缓冲区塞满导致进程卡死）
 ROOT = Path(__file__).resolve().parent
 
-# Windows 上 5500 易出现 WinError 10013（被占用或权限），改用非常见端口；若仍冲突可改此数字
-FRONTEND_PORT = 8765
+from backend.config import Config
+
+BACKEND_HOST = Config.HOST
+BACKEND_PORT = Config.PORT
+
+FRONTEND_PORT = int(os.getenv("FRONTEND_PORT", "8765"))
 
 def start_backend():
     """启动FastAPI后端"""
     logger.info("启动后端服务...")
     return subprocess.Popen(
-        [sys.executable, "-m", "uvicorn", "backend.main:app", "--host", "127.0.0.1", "--port", "8000", "--reload"],
+        [sys.executable, "-m", "uvicorn", "backend.main:app", "--host", BACKEND_HOST, "--port", str(BACKEND_PORT), "--reload"],
         cwd=ROOT,
     )
 
@@ -56,7 +60,7 @@ def check_backend_ready():
     import urllib.request
     import urllib.error
     
-    url = "http://127.0.0.1:8000"
+    url = f"http://{BACKEND_HOST}:{BACKEND_PORT}"
     max_retries = 10
     retry_delay = 1
     
@@ -78,7 +82,7 @@ def main():
     
     # 启动后端
     backend_process = start_backend()
-    logger.info(f"后端服务启动中 (http://127.0.0.1:8000)")
+    logger.info(f"后端服务启动中 (http://{BACKEND_HOST}:{BACKEND_PORT})")
     
     # 等待后端启动并检查状态
     logger.info("等待后端服务就绪...")

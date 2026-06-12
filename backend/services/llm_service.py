@@ -50,7 +50,7 @@ class LLMService:
             messages.append({"role": "user", "content": user_message})
 
             response = self.client.chat.completions.create(
-                model="deepseek-chat",
+                model=Config.LLM_MODEL,
                 messages=messages,
                 temperature=Config.TEMPERATURE,
                 max_tokens=Config.MAX_TOKENS,
@@ -100,7 +100,7 @@ class LLMService:
             messages.append({"role": "user", "content": user_content})
 
             response = self.client.chat.completions.create(
-                model="deepseek-chat",
+                model=Config.LLM_MODEL,
                 messages=messages,
                 temperature=Config.SUMMARY_TEMPERATURE,
                 max_tokens=Config.SUMMARY_MAX_TOKENS,

@@ -11,7 +11,7 @@ from typing import List, Tuple
 import chromadb
 from sentence_transformers import SentenceTransformer
 
-from ..config import Config
+from ..config import Config, DATA_DIR
 
 logging.basicConfig(
     level=logging.INFO,
@@ -20,14 +20,13 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-ROOT = Path(__file__).resolve().parent.parent.parent
 DATA_DIRS = [
-    (ROOT / "data" / "java_backend", "java_backend"),
-    (ROOT / "data" / "web_frontend", "web_frontend"),
+    (DATA_DIR / "java_backend", "java_backend"),
+    (DATA_DIR / "web_frontend", "web_frontend"),
 ]
-CHROMA_DIR = ROOT / "data" / "chroma_db"
+CHROMA_DIR = Path(Config.RAG_DB_DIR)
 
-COLLECTION_NAME = "knowledge_base"
+COLLECTION_NAME = Config.RAG_COLLECTION
 
 MIN_CHARS = 80
 MAX_CHARS = 900
