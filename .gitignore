@@ -1,6 +1,6 @@
 # =============== 大文件（不上传）===============
 # Embedding 模型目录（体积约 300MB）
-models/
+/models/
 
 # Chroma 向量数据库（构建后生成，体积大）
 data/chroma_db/
