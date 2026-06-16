@@ -1,0 +1,16 @@
+[Unit]
+Description=AI面试系统后端服务
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/opt/ai-interview
+Environment=PRODUCTION=true
+Environment=LOG_FILE_ENABLED=true
+ExecStart=/usr/bin/python3 run.py --production
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

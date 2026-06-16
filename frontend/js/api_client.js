@@ -8,11 +8,14 @@ class APIClient {
     }
 
     _getBaseURL() {
+        if (typeof window.__API_BASE_URL__ !== 'undefined') {
+            return window.__API_BASE_URL__;
+        }
         if (typeof window !== 'undefined' && window.location) {
             if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
                 return 'http://127.0.0.1:8000';
             }
-            return window.location.origin + '/api';
+            return window.location.origin;
         }
         return 'http://127.0.0.1:8000';
     }

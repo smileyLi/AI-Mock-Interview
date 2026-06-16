@@ -1,6 +1,9 @@
 #!/usr/bin/env python
 """
-启动脚本 - 同时启动后端和简单的前端服务器
+启动脚本
+  开发模式: python run.py                 （后端 + 前端 http.server + 自动打开浏览器）
+  生产模式: python run.py --production    （仅后端，去掉 reload，不启动前端）
+或设置环境变量: PRODUCTION=true python run.py
 """
 import logging
 import subprocess
@@ -18,26 +21,36 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# 项目根目录（保证工作目录正确，且子进程 stdout 不使用 PIPE，避免缓冲区塞满导致进程卡死）
 ROOT = Path(__file__).resolve().parent
 
 from backend.config import Config
 
 BACKEND_HOST = Config.HOST
 BACKEND_PORT = Config.PORT
-
 FRONTEND_PORT = int(os.getenv("FRONTEND_PORT", "8765"))
 
+IS_PRODUCTION = (
+    os.getenv("PRODUCTION", "false").lower() in ("1", "true", "yes")
+    or "--production" in sys.argv
+)
+
+
 def start_backend():
-    """启动FastAPI后端"""
     logger.info("启动后端服务...")
-    return subprocess.Popen(
-        [sys.executable, "-m", "uvicorn", "backend.main:app", "--host", BACKEND_HOST, "--port", str(BACKEND_PORT), "--reload"],
-        cwd=ROOT,
-    )
+    cmd = [
+        sys.executable, "-m", "uvicorn", "backend.main:app",
+        "--host", "0.0.0.0" if IS_PRODUCTION else BACKEND_HOST,
+        "--port", str(BACKEND_PORT),
+    ]
+    if not IS_PRODUCTION:
+        cmd.append("--reload")
+    return subprocess.Popen(cmd, cwd=ROOT)
+
 
 def start_frontend():
-    """启动简单的前端服务器"""
+    if IS_PRODUCTION:
+        logger.info("生产模式：跳过前端 http.server（请使用 Nginx 提供静态文件）")
+        return None
     logger.info("启动前端服务...")
     return subprocess.Popen(
         [
@@ -48,22 +61,24 @@ def start_frontend():
         cwd=ROOT,
     )
 
+
 def open_browser():
-    """等待几秒后打开浏览器"""
+    if IS_PRODUCTION:
+        return
     time.sleep(5)
     url = f"http://127.0.0.1:{FRONTEND_PORT}"
     webbrowser.open(url)
     logger.info(f"浏览器已打开，访问 {url}")
 
+
 def check_backend_ready():
-    """检查后端服务是否就绪"""
     import urllib.request
     import urllib.error
-    
+
     url = f"http://{BACKEND_HOST}:{BACKEND_PORT}"
     max_retries = 10
     retry_delay = 1
-    
+
     for i in range(max_retries):
         try:
             response = urllib.request.urlopen(url, timeout=2)
@@ -72,43 +87,45 @@ def check_backend_ready():
         except urllib.error.URLError:
             pass
         time.sleep(retry_delay)
-    
+
     return False
+
 
 def main():
     logger.info("=" * 50)
-    logger.info("AI面试系统启动中...")
+    mode = "生产模式" if IS_PRODUCTION else "开发模式"
+    logger.info(f"AI面试系统启动中...（{mode}）")
     logger.info("=" * 50)
-    
-    # 启动后端
+
     backend_process = start_backend()
-    logger.info(f"后端服务启动中 (http://{BACKEND_HOST}:{BACKEND_PORT})")
-    
-    # 等待后端启动并检查状态
+    listen_addr = "0.0.0.0" if IS_PRODUCTION else BACKEND_HOST
+    logger.info(f"后端服务启动中 (http://{listen_addr}:{BACKEND_PORT})")
+
     logger.info("等待后端服务就绪...")
     if check_backend_ready():
         logger.info("后端服务已就绪")
     else:
         logger.error("后端服务启动超时，请检查日志")
-    
-    # 启动前端
+
     frontend_process = start_frontend()
-    logger.info(f"前端服务启动中 (http://127.0.0.1:{FRONTEND_PORT})")
-    
-    # 打开浏览器
+    if frontend_process:
+        logger.info(f"前端服务启动中 (http://127.0.0.1:{FRONTEND_PORT})")
+
     threading.Thread(target=open_browser, daemon=True).start()
-    
+
     logger.info("按 Ctrl+C 停止所有服务")
-    
+
     try:
-        # 等待进程结束
         backend_process.wait()
-        frontend_process.wait()
+        if frontend_process:
+            frontend_process.wait()
     except KeyboardInterrupt:
         logger.info("正在停止服务...")
         backend_process.terminate()
-        frontend_process.terminate()
+        if frontend_process:
+            frontend_process.terminate()
         logger.info("服务已停止")
+
 
 if __name__ == "__main__":
     main()

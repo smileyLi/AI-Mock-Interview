@@ -2,9 +2,10 @@ import os
 from pathlib import Path
 from dotenv import load_dotenv
 
-os.environ["OPENAI_DISABLE_PROXY"] = "1"
-
 load_dotenv()
+
+if os.getenv("OPENAI_DISABLE_PROXY", "true").lower() in ("1", "true", "yes"):
+    os.environ["OPENAI_DISABLE_PROXY"] = "1"
 
 _BACKEND_DIR = Path(__file__).resolve().parent
 _PROJECT_ROOT = _BACKEND_DIR.parent

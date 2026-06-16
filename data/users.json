@@ -12,5 +12,12 @@
     "email": "3760320502@qq.com",
     "password_hash": "$2b$12$FEa.ydQCs7AirHl06aVDeuYR9vx9wxtdtg7AoGFT2.PN4LuRQ6pcK",
     "created_at": "2026-05-28T03:34:28.493048"
+  },
+  "杰jiejie": {
+    "user_id": "b148eb23-d05d-4e8e-af7b-cdce5723172e",
+    "username": "杰jiejie",
+    "email": "1006811814@qq.com",
+    "password_hash": "$2b$12$swSYU0YVQ/SIzTNMkam/kerqCFo/QSoqSVPQRNAxOBMjtACA.BHX6",
+    "created_at": "2026-06-14T11:36:01.649633"
   }
 }

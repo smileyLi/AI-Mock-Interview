@@ -281,8 +281,10 @@ body {
 
 .sidebar.collapsed {
     width: 0;
+    min-width: 0;
+    padding: 0;
     border-right: none;
-    margin-left: -280px;
+    overflow: hidden;
 }
 
 .sidebar-header {
@@ -505,7 +507,6 @@ body {
 }
 
 .main-content.full-width {
-    width: 100%;
     margin-left: 0;
 }
 

@@ -776,8 +776,9 @@ class InterviewApp {
         if (this.isRecording) {
             audioRecorder.stopListening();
         } else {
+            audioPlayer.stop();
             this.updateStatus('请开始说话...', 'info');
-            const started = audioRecorder.startListening();
+            var started = audioRecorder.startListening();
             if (started) {
                 this.isRecording = true;
                 this.recordBtn.textContent = '🔴 录音中... 点击停止';

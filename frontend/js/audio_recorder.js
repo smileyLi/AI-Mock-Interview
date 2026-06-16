@@ -6,75 +6,112 @@ class AudioRecorder {
         this.onResult = null;
         this.onError = null;
         this.onEnd = null;
-        this.init();
+        this._init();
     }
 
-    init() {
-        // 检查浏览器支持
+    _init() {
         if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
-            console.error('浏览器不支持Web Speech API');
+            console.warn('浏览器不支持 Web Speech API，语音输入不可用');
             return;
         }
-        
-        // 创建识别对象
-        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        this._createRecognition();
+    }
+
+    _createRecognition() {
+        var SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
         this.recognition = new SpeechRecognition();
-        
-        // 配置
-        this.recognition.continuous = false;  // 单次识别（说话停顿后自动结束）
-        this.recognition.interimResults = false;  // 只返回最终结果
-        this.recognition.lang = 'zh-CN';  // 中文
+
+        this.recognition.continuous = false;
+        this.recognition.interimResults = false;
+        this.recognition.lang = 'zh-CN';
         this.recognition.maxAlternatives = 1;
-        
-        // 绑定事件
-        this.recognition.onresult = (event) => {
-            const result = event.results[0][0].transcript;
-            if (this.onResult) {
-                this.onResult(result);
+
+        this._bindEvents();
+    }
+
+    _bindEvents() {
+        var self = this;
+
+        this.recognition.onresult = function (event) {
+            try {
+                var results = event.results;
+                if (!results || !results.length) return;
+                var firstResult = results[0];
+                if (!firstResult || !firstResult.length) return;
+                var result = firstResult[0].transcript;
+                if (self.onResult) {
+                    self.onResult(result);
+                }
+            } catch (e) {
+                console.error('处理识别结果时出错:', e);
             }
         };
-        
-        this.recognition.onerror = (event) => {
-            console.error('语音识别错误:', event.error);
-            if (this.onError) {
-                this.onError(event.error);
+
+        this.recognition.onerror = function (event) {
+            var error = event.error || 'unknown';
+            console.error('语音识别错误:', error);
+            self.isListening = false;
+            if (error === 'aborted') {
+                return;
+            }
+            if (self.onError) {
+                self.onError(error);
             }
         };
-        
-        this.recognition.onend = () => {
-            this.isListening = false;
-            if (this.onEnd) {
-                this.onEnd();
+
+        this.recognition.onend = function () {
+            self.isListening = false;
+            if (self.onEnd) {
+                self.onEnd();
             }
         };
     }
 
     startListening() {
         if (!this.recognition) {
-            console.error('语音识别未初始化');
-            return false;
+            this._init();
+            if (!this.recognition) {
+                console.error('语音识别未初始化');
+                return false;
+            }
         }
-        
+
         if (this.isListening) {
             return false;
         }
-        
+
         try {
-            this.recognition.start();
             this.isListening = true;
+            this.recognition.start();
             return true;
         } catch (error) {
             console.error('启动语音识别失败:', error);
+            this.isListening = false;
+            this._resetRecognition();
             return false;
         }
     }
 
     stopListening() {
         if (this.recognition && this.isListening) {
-            this.recognition.stop();
+            try {
+                this.recognition.stop();
+            } catch (e) {
+                console.error('停止语音识别失败:', e);
+            }
+            this.isListening = false;
         }
+    }
+
+    _resetRecognition() {
+        try {
+            if (this.recognition) {
+                this.recognition.abort();
+            }
+        } catch (e) {}
+        this._createRecognition();
+        this.isListening = false;
     }
 }
 
-// 创建全局实例
-const audioRecorder = new AudioRecorder();
+var audioRecorder = new AudioRecorder();
