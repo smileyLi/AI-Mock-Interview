@@ -106,7 +106,7 @@ class APIClient {
             console.error('[API] 请求异常:', error);
             if (error.name === 'TypeError' && error.message.includes('Failed to fetch')) {
                 console.error('[API] 网络错误 - 可能后端服务未启动');
-                throw new Error('网络连接失败，请检查后端服务是否启动');
+                throw new Error('系统错误');
             }
             throw error;
         }
@@ -132,14 +132,14 @@ class APIClient {
             400: this.translateErrorMessage(errorText),
             401: '登录已过期，请重新登录',
             403: '您没有权限执行此操作',
-            404: '请求的资源不存在',
+            404: '系统错误',
             422: '请求参数格式不正确，请检查输入',
-            500: '服务器内部错误，请稍后重试',
-            502: '服务器网关错误，请稍后重试',
-            503: '服务暂时不可用，请稍后重试',
+            500: '系统错误',
+            502: '系统错误',
+            503: '系统错误',
         };
 
-        return errorMessages[status] || `请求失败 (${status})`;
+        return errorMessages[status] || '系统错误';
     }
 
     _extractValidationError(detail) {

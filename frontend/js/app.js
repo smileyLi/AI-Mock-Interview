@@ -456,7 +456,7 @@ class InterviewApp {
         } catch (error) {
             console.error('Resume parse failed:', error);
             this.resumeUploadHint.textContent = 'Parse failed — try PDF or DOCX';
-            this.toast('Resume parse failed: ' + (error.message || 'Unknown error'), 'error');
+            this.toast(error.message || '系统错误', 'error');
         }
     }
 
@@ -560,7 +560,7 @@ class InterviewApp {
             this.updateStatus('Interviewer is speaking...', 'thinking');
         } catch (error) {
             console.error('Start interview failed:', error);
-            this.toast('Failed to start: ' + (error.message || 'Check backend'), 'error');
+            this.toast('Failed to start: ' + (error.message || '系统错误'), 'error');
             this.startInterviewBtn.disabled = false;
         }
     }
