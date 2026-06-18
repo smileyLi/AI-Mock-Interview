@@ -6,19 +6,21 @@ class InterviewApp {
         this.currentDetailSessionId = null;
         this.sidebarCollapsed = false;
         this.pendingDeleteSessionId = null;
-        
+        this.selectedRole = 'java_backend';
+
         this.initElements();
         this.initAuth();
         this.initPasswordToggles();
         this.init();
     }
-    
+
     initElements() {
-        // Auth panel elements
+        // 认证面板
         this.authPanel = document.getElementById('auth-panel');
         this.mainApp = document.getElementById('main-app');
         this.loginForm = document.getElementById('login-form');
         this.registerForm = document.getElementById('register-form');
+        this.forgotForm = document.getElementById('forgot-form');
         this.loginUsername = document.getElementById('login-username');
         this.loginPassword = document.getElementById('login-password');
         this.registerUsername = document.getElementById('register-username');
@@ -32,79 +34,80 @@ class InterviewApp {
         this.switchToLogin = document.getElementById('switch-to-login');
         this.switchToForgot = document.getElementById('switch-to-forgot');
         this.switchToLoginFromForgot = document.getElementById('switch-to-login-from-forgot');
-
-        this.forgotForm = document.getElementById('forgot-form');
         this.forgotUsername = document.getElementById('forgot-username');
         this.forgotEmail = document.getElementById('forgot-email');
         this.forgotPassword = document.getElementById('forgot-password');
         this.forgotCode = document.getElementById('forgot-code');
         this.sendCodeBtn = document.getElementById('send-code-btn');
         this.resetPasswordBtn = document.getElementById('reset-password-btn');
-        
-        // User info
-        this.userAvatar = document.getElementById('user-avatar');
-        this.userName = document.getElementById('user-name');
-        this.logoutBtn = document.getElementById('logout-btn');
-        
-        // 侧边栏元素
+
+        // 侧边栏
         this.sidebar = document.getElementById('sidebar');
         this.sidebarToggle = document.getElementById('sidebar-toggle');
         this.sidebarExpandBtn = document.getElementById('sidebar-expand-btn');
         this.newInterviewBtn = document.getElementById('new-interview-btn');
-        this.historyListSidebar = document.getElementById('history-list-sidebar');
-        this.historyEmptySidebar = document.getElementById('history-empty-sidebar');
-        
-        // 主界面元素
-        this.mainContent = document.querySelector('.main-content');
+        this.userAvatar = document.getElementById('user-avatar');
+        this.userNameEl = document.getElementById('user-name');
+        this.userEmailEl = document.getElementById('user-email-display');
+        this.logoutBtn = document.getElementById('logout-btn');
+        this.historyList = document.getElementById('history-list');
+        this.historyEmpty = document.getElementById('history-empty');
+        this.resumeStatusBadge = document.getElementById('resume-status-badge');
+        this.resumeFileInput = document.getElementById('resume-file-input');
+        this.resumeFileHint = document.getElementById('resume-file-hint');
+        this.resumeClearBtn = document.getElementById('resume-clear-btn');
+
+        // 欢迎面板
+        this.welcomePanel = document.getElementById('welcome-panel');
+        this.roleCards = document.querySelectorAll('.role-card');
+        this.resumeUploadZone = document.getElementById('resume-upload-zone');
+        this.resumeSavedState = document.getElementById('resume-saved-state');
+        this.resumeUploadPrompt = document.getElementById('resume-upload-prompt');
+        this.resumeFilename = document.getElementById('resume-filename');
+        this.resumeChars = document.getElementById('resume-chars');
+        this.resumeUploadHint = document.getElementById('resume-upload-hint');
+        this.startInterviewBtn = document.getElementById('start-interview-btn');
+
+        // 面试面板
         this.interviewPanel = document.getElementById('interview-panel');
+        this.interviewRoleBadge = document.getElementById('interview-role-badge');
+        this.statusDot = document.getElementById('status-dot');
+        this.statusText = document.getElementById('status-text');
+        this.chatArea = document.getElementById('chat-area');
+        this.voiceBtn = document.getElementById('voice-btn');
+        this.sendBtn = document.getElementById('send-btn');
+        this.manualInput = document.getElementById('manual-input');
+        this.endInterviewBtn = document.getElementById('end-interview-btn');
+        this.viewReportBtn = document.getElementById('view-report-btn');
+
+        // 详情面板
         this.detailPanel = document.getElementById('detail-panel');
         this.detailContent = document.getElementById('detail-content');
-        this.deleteHistoryBtnDetail = document.getElementById('delete-history-btn-detail');
-        this.jobTitle = document.getElementById('job-title');
-        
-        // 聊天区域
-        this.chatArea = document.getElementById('chat-area');
-        this.status = document.getElementById('status');
-        this.manualInput = document.getElementById('manual-input');
-        this.sendBtn = document.getElementById('send-btn');
-        
-        // 简历上传
-        this.resumeFileInput = document.getElementById('resume-file-input');
-        this.resumeHint = document.getElementById('resume-hint');
-        this.resumeStatusText = document.getElementById('resume-status-text');
-        this.clearResumeBtn = document.getElementById('clear-resume-btn');
-        this.jobSelect = document.getElementById('job-select');
-        
-        // 控制按钮
-        this.startBtn = document.getElementById('start-btn');
-        this.recordBtn = document.getElementById('record-btn');
-        this.endBtn = document.getElementById('end-btn');
-        
+        this.detailBackBtn = document.getElementById('detail-back-btn');
+        this.detailTitle = document.getElementById('detail-title');
+        this.detailDeleteBtn = document.getElementById('detail-delete-btn');
+
         // 报告相关
         this.lastSummaryText = '';
-        this.viewReportBtn = document.getElementById('view-report-btn');
         this.summaryReportModal = document.getElementById('summary-report-modal');
         this.summaryReportBody = document.getElementById('summary-report-body');
         this.summaryDownloadPdfBtn = document.getElementById('summary-download-pdf-btn');
         this.summaryModalCloseBtn = document.getElementById('summary-modal-close-btn');
         this.closeSummarySpan = document.querySelector('.close-summary');
-        
+
         // 删除确认弹窗
         this.deleteConfirmModal = document.getElementById('delete-confirm-modal');
         this.deleteCancelBtn = document.getElementById('delete-cancel-btn');
         this.deleteConfirmBtn = document.getElementById('delete-confirm-btn');
         this.closeDeleteBtn = document.querySelector('.close-delete');
-        
+
         // 清除简历确认弹窗
         this.clearResumeModal = document.getElementById('clear-resume-modal');
         this.clearResumeCancelBtn = document.getElementById('clear-resume-cancel-btn');
         this.clearResumeConfirmBtn = document.getElementById('clear-resume-confirm-btn');
         this.closeClearResumeBtn = document.querySelector('.close-clear-resume');
-        
-        // 岗位选择区域
-        this.jobSelectArea = document.getElementById('job-select-area');
     }
-    
+
     async initAuth() {
         if (apiClient.isAuthenticated()) {
             try {
@@ -115,7 +118,7 @@ class InterviewApp {
                 await this.loadSavedResumeInfo();
                 await this.loadHistoryToSidebar();
             } catch (error) {
-                console.log('Token验证失败:', error);
+                console.log('Token validation failed:', error);
                 apiClient.logout();
                 this.clearPasswordFields();
                 this.showAuthPanel();
@@ -123,160 +126,104 @@ class InterviewApp {
         } else {
             this.showAuthPanel();
         }
-        
-        // Auth events
+
         this.loginBtn.addEventListener('click', () => this.handleLogin());
         this.registerBtn.addEventListener('click', () => this.handleRegister());
         this.registerSendCodeBtn?.addEventListener('click', () => this.handleSendRegisterCode());
-        this.switchToRegister.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.switchToRegisterForm();
-        });
-        this.switchToLogin.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.switchToLoginForm();
-        });
-        this.switchToForgot?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.switchToForgotForm();
-        });
-        this.switchToLoginFromForgot?.addEventListener('click', (e) => {
-            e.preventDefault();
-            this.switchToLoginForm();
-        });
+        this.switchToRegister.addEventListener('click', (e) => { e.preventDefault(); this.switchToRegisterForm(); });
+        this.switchToLogin.addEventListener('click', (e) => { e.preventDefault(); this.switchToLoginForm(); });
+        this.switchToForgot?.addEventListener('click', (e) => { e.preventDefault(); this.switchToForgotForm(); });
+        this.switchToLoginFromForgot?.addEventListener('click', (e) => { e.preventDefault(); this.switchToLoginForm(); });
         this.logoutBtn.addEventListener('click', () => this.handleLogout());
-
         this.sendCodeBtn?.addEventListener('click', () => this.handleSendCode());
         this.resetPasswordBtn?.addEventListener('click', () => this.handleResetPassword());
-        
+
         window.addEventListener('auth:logout', () => {
             this.clearPasswordFields();
             this.showAuthPanel();
-            this.updateStatus('登录已过期，请重新登录', 'error');
+            this.toast('Session expired. Please sign in again.', 'error');
         });
-        
-        // Enter key for login/register
-        this.loginPassword.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.handleLogin();
-        });
-        this.registerPassword.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.handleRegister();
-        });
+
+        this.loginPassword.addEventListener('keypress', (e) => { if (e.key === 'Enter') this.handleLogin(); });
+        this.registerPassword.addEventListener('keypress', (e) => { if (e.key === 'Enter') this.handleRegister(); });
     }
-    
+
     async handleLogin() {
         const username = this.loginUsername.value.trim();
         const password = this.loginPassword.value;
-        
-        if (!username || !password) {
-            this.updateAuthStatus('请输入用户名和密码', 'error');
-            return;
-        }
-        
-        this.updateAuthStatus('登录中...', 'info');
-        
+        if (!username || !password) { this.toast('Please enter username and password', 'error'); return; }
+        this.toast('Signing in...', 'info');
         try {
             await apiClient.login(username, password);
-            this.updateAuthStatus('登录成功！', 'success');
+            this.toast('Signed in successfully', 'success');
             this.showMainApp();
             this.updateUserInfo();
             await this.loadSavedResumeInfo();
             await this.loadHistoryToSidebar();
         } catch (error) {
-            console.error('Login failed:', error);
-            this.updateAuthStatus(error.message || '登录失败', 'error');
+            this.toast(error.message || 'Login failed', 'error');
         }
     }
-    
+
     async handleRegister() {
         const username = this.registerUsername.value.trim();
         const email = this.registerEmail.value.trim();
         const password = this.registerPassword.value;
         const code = this.registerCode.value.trim();
-        
-        if (!username || !email || !password || !code) {
-            this.updateAuthStatus('请填写所有字段');
-            return;
-        }
-        
-        if (username.length < 3) {
-            this.updateAuthStatus('用户名至少3个字符');
-            return;
-        }
-        
-        if (password.length < 6) {
-            this.updateAuthStatus('密码至少6个字符');
-            return;
-        }
-
-        if (code.length !== 6) {
-            this.updateAuthStatus('请输入6位验证码');
-            return;
-        }
-        
+        if (!username || !email || !password || !code) { this.toast('All fields are required'); return; }
+        if (username.length < 3) { this.toast('Username must be at least 3 characters'); return; }
+        if (password.length < 6) { this.toast('Password must be at least 6 characters'); return; }
+        if (code.length !== 6) { this.toast('Verification code must be 6 digits'); return; }
         try {
             await apiClient.register(username, email, password, code);
-            this.updateAuthStatus('注册成功！', 'success');
+            this.toast('Registration successful', 'success');
             this.showMainApp();
             this.updateUserInfo();
             await this.loadSavedResumeInfo();
             await this.loadHistoryToSidebar();
         } catch (error) {
-            console.error('Register failed:', error);
-            this.updateAuthStatus(error.message || '注册失败');
+            this.toast(error.message || 'Registration failed');
         }
     }
 
     async handleSendRegisterCode() {
         const email = this.registerEmail.value.trim();
-
-        if (!email) {
-            this.updateAuthStatus('请先输入邮箱');
-            return;
-        }
-
+        if (!email) { this.toast('Please enter your email first'); return; }
         this.registerSendCodeBtn.disabled = true;
-        this.registerSendCodeBtn.textContent = '发送中...';
-
+        this.registerSendCodeBtn.textContent = 'Sending...';
         try {
             const result = await apiClient.sendRegisterCode(email);
-            this.updateAuthStatus(result.message || '验证码已发送');
+            this.toast(result.message || 'Verification code sent');
         } catch (error) {
-            this.updateAuthStatus(error.message || '发送失败');
+            this.toast(error.message || 'Failed to send');
         } finally {
             this.registerSendCodeBtn.disabled = false;
-            this.registerSendCodeBtn.textContent = '发送验证码';
+            this.registerSendCodeBtn.textContent = 'Send Code';
         }
     }
-    
+
     handleLogout() {
         apiClient.logout();
         this.clearPasswordFields();
         this.showAuthPanel();
         this.switchToLoginForm();
-        this.updateAuthStatus('已退出登录', 'info');
+        this.toast('Signed out', 'info');
     }
 
     async handleSendCode() {
         const username = this.forgotUsername.value.trim();
         const email = this.forgotEmail.value.trim();
-
-        if (!username || !email) {
-            this.updateAuthStatus('请输入用户名和邮箱');
-            return;
-        }
-
+        if (!username || !email) { this.toast('Please enter username and email'); return; }
         this.sendCodeBtn.disabled = true;
-        this.sendCodeBtn.textContent = '发送中...';
-
+        this.sendCodeBtn.textContent = 'Sending...';
         try {
             const result = await apiClient.forgotPassword(username, email);
-            this.updateAuthStatus(result.message || '验证码已发送');
+            this.toast(result.message || 'Verification code sent');
         } catch (error) {
-            this.updateAuthStatus(error.message || '发送失败');
+            this.toast(error.message || 'Failed to send');
         } finally {
             this.sendCodeBtn.disabled = false;
-            this.sendCodeBtn.textContent = '发送验证码';
+            this.sendCodeBtn.textContent = 'Send Code';
         }
     }
 
@@ -285,28 +232,15 @@ class InterviewApp {
         const email = this.forgotEmail.value.trim();
         const password = this.forgotPassword.value;
         const code = this.forgotCode.value.trim();
-
-        if (!username || !email || !password || !code) {
-            this.updateAuthStatus('请填写所有字段');
-            return;
-        }
-
-        if (password.length < 6) {
-            this.updateAuthStatus('新密码至少6个字符');
-            return;
-        }
-
-        if (code.length !== 6) {
-            this.updateAuthStatus('请输入6位验证码');
-            return;
-        }
-
+        if (!username || !email || !password || !code) { this.toast('All fields are required'); return; }
+        if (password.length < 6) { this.toast('New password must be at least 6 characters'); return; }
+        if (code.length !== 6) { this.toast('Verification code must be 6 digits'); return; }
         try {
             const result = await apiClient.resetPassword(username, email, code, password);
-            this.updateAuthStatus(result.message || '密码重置成功');
+            this.toast(result.message || 'Password reset successfully');
             this.switchToLoginForm();
         } catch (error) {
-            this.updateAuthStatus(error.message || '重置失败');
+            this.toast(error.message || 'Reset failed');
         }
     }
 
@@ -321,9 +255,7 @@ class InterviewApp {
         if (this.forgotEmail) this.forgotEmail.value = '';
         if (this.forgotPassword) this.forgotPassword.value = '';
         if (this.forgotCode) this.forgotCode.value = '';
-        document.querySelectorAll('.password-input-wrapper input').forEach(input => {
-            this._updatePasswordToggleState(input);
-        });
+        document.querySelectorAll('.password-input-wrapper input').forEach(input => this._updatePasswordToggleState(input));
     }
 
     clearPasswordFields() {
@@ -336,585 +268,451 @@ class InterviewApp {
     }
 
     initPasswordToggles() {
-        const eyeSvg = `<svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`;
-        const eyeOffSvg = `<svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>`;
-
-        const allToggles = document.querySelectorAll('.password-toggle');
-        allToggles.forEach(btn => {
+        const eyeSvg = '<svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+        const eyeOffSvg = '<svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>';
+        document.querySelectorAll('.password-toggle').forEach(btn => {
             btn.addEventListener('mousedown', (e) => {
                 e.preventDefault();
-                const wrapper = btn.closest('.password-input-wrapper');
-                const input = wrapper.querySelector('input');
-                const isPassword = input.type === 'password';
-                input.type = isPassword ? 'text' : 'password';
-                btn.innerHTML = isPassword ? eyeOffSvg : eyeSvg;
+                const input = btn.closest('.password-input-wrapper').querySelector('input');
+                const isPw = input.type === 'password';
+                input.type = isPw ? 'text' : 'password';
+                btn.innerHTML = isPw ? eyeOffSvg : eyeSvg;
             });
         });
-
-        const allPasswordInputs = document.querySelectorAll('.password-input-wrapper input');
-        allPasswordInputs.forEach(input => {
+        document.querySelectorAll('.password-input-wrapper input').forEach(input => {
             input.addEventListener('input', () => this._updatePasswordToggleState(input));
-            input.addEventListener('blur', () => {
-                setTimeout(() => this._updatePasswordToggleState(input), 200);
-            });
+            input.addEventListener('blur', () => { setTimeout(() => this._updatePasswordToggleState(input), 200); });
         });
     }
 
     _updatePasswordToggleState(input) {
         const wrapper = input.closest('.password-input-wrapper');
         if (!wrapper) return;
-        if (input.value.length > 0) {
-            wrapper.classList.add('has-text');
-        } else {
-            wrapper.classList.remove('has-text');
-        }
-    }
-    
-    showAuthPanel() {
-        this.authPanel.classList.remove('hidden');
-        this.mainApp.classList.add('hidden');
-    }
-    
-    showMainApp() {
-        this.authPanel.classList.add('hidden');
-        this.mainApp.classList.remove('hidden');
-    }
-    
-    switchToRegisterForm() {
-        this.clearAllAuthFields();
-        this.loginForm.classList.add('hidden');
-        this.forgotForm.classList.add('hidden');
-        this.registerForm.classList.remove('hidden');
-    }
-    
-    switchToLoginForm() {
-        this.clearAllAuthFields();
-        this.registerForm.classList.add('hidden');
-        this.forgotForm.classList.add('hidden');
-        this.loginForm.classList.remove('hidden');
+        if (input.value.length > 0) wrapper.classList.add('has-text');
+        else wrapper.classList.remove('has-text');
     }
 
-    switchToForgotForm() {
-        this.clearAllAuthFields();
-        this.loginForm.classList.add('hidden');
-        this.registerForm.classList.add('hidden');
-        this.forgotForm.classList.remove('hidden');
-    }
-    
-    updateAuthStatus(message, type = 'info') {
-        const container = document.getElementById('toast-container');
-        if (!container || !message) return;
+    showAuthPanel() { this.authPanel.classList.remove('hidden'); this.mainApp.classList.add('hidden'); }
+    showMainApp() { this.authPanel.classList.add('hidden'); this.mainApp.classList.remove('hidden'); }
+    switchToRegisterForm() { this.clearAllAuthFields(); this.loginForm.classList.add('hidden'); this.forgotForm.classList.add('hidden'); this.registerForm.classList.remove('hidden'); }
+    switchToLoginForm() { this.clearAllAuthFields(); this.registerForm.classList.add('hidden'); this.forgotForm.classList.add('hidden'); this.loginForm.classList.remove('hidden'); }
+    switchToForgotForm() { this.clearAllAuthFields(); this.loginForm.classList.add('hidden'); this.registerForm.classList.add('hidden'); this.forgotForm.classList.remove('hidden'); }
 
-        const toast = document.createElement('div');
-        toast.className = 'toast-message';
-        toast.style.color = '#000000';
-        toast.textContent = message;
-        container.appendChild(toast);
-
-        setTimeout(() => {
-            toast.style.opacity = '0';
-            toast.style.transition = 'opacity 0.3s ease';
-            setTimeout(() => toast.remove(), 300);
-        }, 1000);
-    }
-    
     updateUserInfo() {
         if (apiClient.user) {
-            this.userName.textContent = apiClient.user.username;
+            this.userNameEl.textContent = apiClient.user.username;
+            if (this.userEmailEl) this.userEmailEl.textContent = apiClient.user.email || '';
+            this.userAvatar.textContent = (apiClient.user.username || 'U').charAt(0).toUpperCase();
         }
     }
-    
-    // 岗位名称映射
-    getJobTitle(jobRole) {
-        const titles = {
-            'java_backend': '☕ Java后端开发工程师岗位',
-            'web_frontend': '🎨 Web前端开发工程师岗位'
-        };
-        return titles[jobRole] || titles['java_backend'];
-    }
-    
-    // 更新页面标题
-    updateJobTitle(jobRole) {
-        if (this.jobTitle) {
-            this.jobTitle.textContent = this.getJobTitle(jobRole);
-        }
-    }
-    
-    // 获取当前选择的岗位
-    getSelectedJobRole() {
-        if (this.jobSelect) {
-            return this.jobSelect.value;
-        }
-        return 'java_backend';
-    }
-    
-    init() {
-        // 侧边栏交互
-        this.sidebarToggle?.addEventListener('click', () => this.toggleSidebar());
-        this.sidebarExpandBtn?.addEventListener('click', () => this.toggleSidebar());
-        this.newInterviewBtn?.addEventListener('click', () => this.onNewInterviewClick());
-        
-        // 简历上传
-        this.resumeFileInput?.addEventListener('change', (e) => this.onResumeFileSelected(e));
-        this.clearResumeBtn?.addEventListener('click', () => this.openClearResumeModal());
-        
-        // 岗位选择
-        this.jobSelect?.addEventListener('change', () => {
-            const jobRole = this.getSelectedJobRole();
-            this.updateJobTitle(jobRole);
-        });
-        
-        // 控制按钮
-        this.startBtn?.addEventListener('click', () => this.onStartButtonClick());
-        this.recordBtn?.addEventListener('click', () => this.toggleRecording());
-        this.endBtn?.addEventListener('click', () => this.endInterview());
-        
-        // 手动输入
-        this.sendBtn?.addEventListener('click', () => this.sendManualMessage());
-        this.manualInput?.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') this.sendManualMessage();
-        });
-        
-        // 历史详情
-        this.deleteHistoryBtnDetail?.addEventListener('click', () => this.deleteCurrentHistory());
-        
-        // 报告
-        this.viewReportBtn?.addEventListener('click', () => this.openSummaryReportModal());
-        this.summaryDownloadPdfBtn?.addEventListener('click', () => this.downloadSummaryPdf());
-        this.summaryModalCloseBtn?.addEventListener('click', () => this.closeSummaryReportModal());
-        this.closeSummarySpan?.addEventListener('click', () => this.closeSummaryReportModal());
-        
-        // 删除确认弹窗
-        this.deleteCancelBtn?.addEventListener('click', () => this.closeDeleteConfirmModal());
-        this.deleteConfirmBtn?.addEventListener('click', () => this.confirmDelete());
-        this.closeDeleteBtn?.addEventListener('click', () => this.closeDeleteConfirmModal());
-        
-        // 清除简历确认弹窗
-        this.clearResumeCancelBtn?.addEventListener('click', () => this.closeClearResumeModal());
-        this.clearResumeConfirmBtn?.addEventListener('click', () => this.confirmClearResume());
-        this.closeClearResumeBtn?.addEventListener('click', () => this.closeClearResumeModal());
-        
-        // 语音和音频回调
-        audioRecorder.onResult = (text) => this.handleUserInput(text);
-        audioRecorder.onError = (error) => {
-            this.updateStatus(`语音识别错误: ${error}`, 'error');
-            this.isRecording = false;
-            this.recordBtn.textContent = '🎙️ 按住说话';
-            this.recordBtn.classList.remove('recording');
-        };
-        audioRecorder.onEnd = () => {
-            this.isRecording = false;
-            this.recordBtn.textContent = '🎙️ 按住说话';
-            this.recordBtn.classList.remove('recording');
-        };
-        
-        audioPlayer.onStart = () => {
-            this.updateStatus('面试官正在说话...', 'info');
-        };
-        audioPlayer.onEnd = () => {
-            this.updateStatus('等待您的回答...', 'info');
-            if (this.isInterviewActive) {
-                this.enableRecording(true);
-            }
-        };
-    }
-    
-    // ==================== 侧边栏功能 ====================
-    
+
+    // ==================== 侧边栏 ====================
+
     toggleSidebar() {
         this.sidebarCollapsed = !this.sidebarCollapsed;
         if (this.sidebarCollapsed) {
             this.sidebar.classList.add('collapsed');
             this.sidebarExpandBtn.classList.add('visible');
-            this.mainContent.classList.add('full-width');
         } else {
             this.sidebar.classList.remove('collapsed');
             this.sidebarExpandBtn.classList.remove('visible');
-            this.mainContent.classList.remove('full-width');
         }
     }
-    
+
     async loadHistoryToSidebar() {
         if (!apiClient.isAuthenticated()) return;
-        
         try {
             const interviews = await apiClient.getInterviewHistory();
             this.renderSidebarHistory(interviews);
         } catch (error) {
-            console.error('加载历史记录失败:', error);
+            console.error('Failed to load history:', error);
         }
     }
-    
+
     renderSidebarHistory(interviews) {
-        if (!this.historyListSidebar) return;
-        
+        if (!this.historyList) return;
+
         if (interviews.length === 0) {
-            this.historyEmptySidebar.style.display = 'block';
-            this.historyListSidebar.innerHTML = '';
-            this.historyListSidebar.appendChild(this.historyEmptySidebar);
+            this.historyEmpty.style.display = 'block';
+            this.historyList.innerHTML = '';
+            this.historyList.appendChild(this.historyEmpty);
             return;
         }
-        
-        this.historyEmptySidebar.style.display = 'none';
-        const html = interviews.map(interview => `
-            <div class="history-item-sidebar ${this.currentDetailSessionId === interview.session_id ? 'active' : ''}" data-session-id="${interview.session_id}">
-                <div class="history-item-sidebar-date">${this.formatDate(interview.created_at)}</div>
-                <div class="history-item-sidebar-position">${this.getJobTitle(interview.job_role || 'java_backend').replace('岗位', '')}</div>
-                <button class="history-item-sidebar-delete" data-session-id="${interview.session_id}">删除</button>
-            </div>
-        `).join('');
-        
-        this.historyListSidebar.innerHTML = html;
-        
-        this.historyListSidebar.querySelectorAll('.history-item-sidebar').forEach(item => {
+
+        this.historyEmpty.style.display = 'none';
+        const roleNames = { 'java_backend': 'Java Backend', 'web_frontend': 'Web Frontend' };
+
+        const html = interviews.map(item => {
+            const role = roleNames[item.job_role] || 'Java Backend';
+            const msgCount = (item.messages && item.messages.length) ? Math.floor(item.messages.length / 2) : 0;
+            const hasReport = item.summary && item.summary.trim().length > 0;
+            return `
+                <div class="history-item ${this.currentDetailSessionId === item.session_id ? 'active' : ''}" data-sid="${item.session_id}">
+                    <div class="history-item-date">${this.formatDate(item.created_at)}</div>
+                    <div class="history-item-meta">
+                        <span class="history-item-role">${role}</span>
+                        ${msgCount > 0 ? `<span class="history-item-badge">${msgCount}Q</span>` : ''}
+                        ${hasReport ? '<span class="history-item-badge" style="background:rgba(5,150,105,0.2);color:#34d399;">Report</span>' : ''}
+                    </div>
+                    <button class="history-item-delete" data-sid="${item.session_id}" title="Delete">
+                        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                        </svg>
+                    </button>
+                </div>`;
+        }).join('');
+
+        this.historyList.innerHTML = html;
+
+        this.historyList.querySelectorAll('.history-item').forEach(item => {
             item.addEventListener('click', (e) => {
-                if (e.target.classList.contains('history-item-sidebar-delete')) {
+                if (e.target.closest('.history-item-delete')) {
                     e.stopPropagation();
-                    const sessionId = e.target.dataset.sessionId;
-                    this.deleteHistoryFromSidebar(sessionId);
+                    this.pendingDeleteSessionId = e.target.closest('.history-item-delete').dataset.sid;
+                    this.openDeleteConfirmModal();
                 } else {
-                    const sessionId = item.dataset.sessionId;
-                    this.showHistoryDetail(sessionId);
+                    this.showHistoryDetail(item.dataset.sid);
                 }
             });
         });
     }
-    
-    deleteHistoryFromSidebar(sessionId) {
-        this.pendingDeleteSessionId = sessionId;
-        this.openDeleteConfirmModal();
-    }
-    
+
     onNewInterviewClick() {
         if (this.isInterviewActive) {
-            if (!confirm('当前有面试正在进行中，确定要开始新的面试吗？')) {
-                return;
-            }
+            if (!confirm('An interview is in progress. Start a new one?')) return;
         }
-        this.showInterviewPanel();
-        this.resetInterviewPanel();
-        this.showJobSelect();
-        this.updateStatus('选择岗位并上传简历（可选），然后点击「开始面试」');
+        this.showWelcomePanel();
     }
-    
+
     // ==================== 面板切换 ====================
-    
+
+    showWelcomePanel() {
+        this.welcomePanel.classList.remove('hidden');
+        this.interviewPanel.classList.add('hidden');
+        this.detailPanel.classList.add('hidden');
+        this.currentDetailSessionId = null;
+        this.newInterviewBtn.classList.add('active');
+        this.loadHistoryToSidebar();
+    }
+
     showInterviewPanel() {
+        this.welcomePanel.classList.add('hidden');
         this.interviewPanel.classList.remove('hidden');
         this.detailPanel.classList.add('hidden');
         this.currentDetailSessionId = null;
-        this.loadHistoryToSidebar();
+        this.newInterviewBtn.classList.remove('active');
     }
-    
-    resetInterviewPanel() {
-        this.chatArea.innerHTML = '<div class="message system"><span class="role">🤖 系统</span><p>点击左侧「新的面试」开始模拟面试，或点击历史记录查看过往面试详情。</p></div>';
-        this.startBtn.disabled = false;
-        this.endBtn.disabled = true;
-        this.hideReportButton();
-        this.enableRecording(false);
+
+    showDetailPanel() {
+        this.welcomePanel.classList.add('hidden');
+        this.interviewPanel.classList.add('hidden');
+        this.detailPanel.classList.remove('hidden');
+        this.newInterviewBtn.classList.remove('active');
     }
-    
-    showJobSelect() {
-        if (this.jobSelectArea) {
-            this.jobSelectArea.classList.remove('btn-hidden');
-        }
+
+    getRoleDisplayName(role) {
+        const map = { 'java_backend': 'Java Backend', 'web_frontend': 'Web Frontend' };
+        return map[role] || 'Java Backend';
     }
-    
-    hideJobSelect() {
-        if (this.jobSelectArea) {
-            this.jobSelectArea.classList.add('btn-hidden');
-        }
-    }
-    
-    async showHistoryDetail(sessionId) {
-        try {
-            const interview = await apiClient.getInterviewDetail(sessionId);
-            this.currentDetailSessionId = sessionId;
-            
-            this.interviewPanel.classList.add('hidden');
-            this.detailPanel.classList.remove('hidden');
-            
-            let detailHtml = '<div class="detail-messages">';
-            interview.messages.forEach(msg => {
-                const roleClass = msg.role === 'user' ? 'user' : 'assistant';
-                const roleText = msg.role === 'user' ? '👤 您' : '🎯 面试官';
-                detailHtml += `
-                    <div class="message ${roleClass}">
-                        <span class="role">${roleText}</span>
-                        <p>${msg.content}</p>
-                    </div>
-                `;
+
+    getSelectedJobRole() { return this.selectedRole; }
+
+    // ==================== 角色选择 ====================
+
+    initRoleSelector() {
+        this.roleCards.forEach(card => {
+            card.addEventListener('click', () => {
+                this.roleCards.forEach(c => c.classList.remove('selected'));
+                card.classList.add('selected');
+                this.selectedRole = card.dataset.role;
             });
-            detailHtml += '</div>';
-            
-            if (interview.summary) {
-                detailHtml += `
-                    <div class="detail-summary" style="text-align: center; margin-top: 20px;">
-                        <button class="btn btn-primary" onclick="app.viewHistoryReport('${sessionId}')">📄 查看面试报告</button>
-                    </div>
-                `;
-            }
-            
-            this.detailContent.innerHTML = detailHtml;
-            this.loadHistoryToSidebar();
-            
-        } catch (error) {
-            console.error('获取详情失败:', error);
-            this.updateStatus('获取面试详情失败', 'error');
-        }
+        });
     }
-    
-    async viewHistoryReport(sessionId) {
-        try {
-            const interview = await apiClient.getInterviewDetail(sessionId);
-            if (interview && interview.summary) {
-                this.showReportButton(interview.summary);
-                this.openSummaryReportModal();
-            } else {
-                this.updateStatus('未找到面试报告', 'error');
-            }
-        } catch (error) {
-            console.error('获取面试报告失败:', error);
-            this.updateStatus('获取面试报告失败', 'error');
-        }
-    }
-    
+
     // ==================== 简历上传 ====================
-    
+
     async onResumeFileSelected(event) {
         const file = event.target?.files?.[0];
         if (!file) return;
-        
-        if (this.resumeHint) {
-            this.resumeHint.textContent = '解析中...';
-        }
-        this.updateStatus('正在解析简历...');
-        
+
+        this.resumeUploadHint.textContent = 'Parsing...';
+        this.toast('Parsing resume...', 'info');
+
         try {
             const result = await apiClient.parseResume(file);
-            const raw = result.text != null ? String(result.text) : '';
-            const text = raw.trim();
-            
+            const text = (result.text != null ? String(result.text) : '').trim();
+
             if (!text) {
-                if (this.resumeHint) {
-                    this.resumeHint.textContent = '未提取到文字（常见于扫描版 PDF）';
-                }
-                this.updateStatus('文件中未识别到文字，请换用可复制文本的 PDF 或 docx', 'error');
+                this.resumeUploadHint.textContent = 'No text extracted (scanned PDF?)';
+                this.toast('No readable text found in file', 'error');
                 return;
             }
-            
+
             const name = result.filename || file.name;
-            const extra = result.truncated ? '（已截断过长文本）' : '';
-            
+            const extra = result.truncated ? ' (truncated)' : '';
             await this.saveResumeToServer(text, name);
-            
-            if (this.resumeHint) {
-                this.resumeHint.textContent = `${name}，约 ${text.length} 字${extra}`;
-            }
-            this.updateStatus('简历上传成功！点击「开始面试」即可开始');
+            this.resumeUploadHint.textContent = `${name} — ${text.length} characters${extra}`;
+            this.toast('Resume uploaded successfully', 'success');
         } catch (error) {
-            console.error('简历解析失败:', error);
-            if (this.resumeHint) {
-                this.resumeHint.textContent = '解析失败，请使用 PDF 或 docx';
-            }
-            this.updateStatus('简历解析失败：' + (error.message || '请检查格式与网络'), 'error');
+            console.error('Resume parse failed:', error);
+            this.resumeUploadHint.textContent = 'Parse failed — try PDF or DOCX';
+            this.toast('Resume parse failed: ' + (error.message || 'Unknown error'), 'error');
         }
     }
-    
+
+    async saveResumeToServer(text, filename) {
+        try {
+            await apiClient.saveResume(text, filename);
+            await this.loadSavedResumeInfo();
+        } catch (error) {
+            console.error('Save resume failed:', error);
+            throw error;
+        }
+    }
+
+    async loadSavedResumeInfo() {
+        if (!apiClient.isAuthenticated()) return;
+        try {
+            const info = await apiClient.getResumeInfo();
+            this.updateResumeStatus(info);
+        } catch (error) {
+            console.error('Load resume info failed:', error);
+            this.updateResumeStatus(null);
+        }
+    }
+
+    updateResumeStatus(info) {
+        const hasResume = info && info.exists;
+
+        // 侧边栏 badge
+        if (this.resumeStatusBadge) {
+            this.resumeStatusBadge.textContent = hasResume ? 'Uploaded' : 'None';
+            if (hasResume) this.resumeStatusBadge.classList.add('has-resume');
+            else this.resumeStatusBadge.classList.remove('has-resume');
+        }
+
+        // 侧边栏 hint
+        if (this.resumeFileHint) {
+            this.resumeFileHint.textContent = hasResume ? (info.filename || 'Resume saved') : 'PDF, DOCX (max 10MB)';
+        }
+
+        // 欢迎面板状态
+        if (hasResume) {
+            this.resumeSavedState.classList.remove('hidden');
+            this.resumeUploadPrompt.classList.add('hidden');
+            this.resumeFilename.textContent = info.filename || 'Resume';
+            this.resumeChars.textContent = `${info.char_count || 0} characters`;
+            if (this.resumeClearBtn) this.resumeClearBtn.style.display = '';
+        } else {
+            this.resumeSavedState.classList.add('hidden');
+            this.resumeUploadPrompt.classList.remove('hidden');
+        }
+    }
+
+    openClearResumeModal() {
+        if (this.clearResumeModal) this.clearResumeModal.style.display = 'block';
+    }
+
+    closeClearResumeModal() {
+        if (this.clearResumeModal) this.clearResumeModal.style.display = 'none';
+    }
+
+    async confirmClearResume() {
+        this.closeClearResumeModal();
+        try {
+            await apiClient.deleteResume();
+            this.updateResumeStatus(null);
+            this.resumeUploadHint.textContent = '';
+            if (this.resumeFileInput) this.resumeFileInput.value = '';
+            this.toast('Resume removed', 'info');
+        } catch (error) {
+            console.error('Clear resume failed:', error);
+            this.toast('Failed to remove resume', 'error');
+        }
+    }
+
     // ==================== 面试流程 ====================
-    
-    onStartButtonClick() {
-        if (this.isInterviewActive) {
-            return;
-        }
-        this.startInterview();
-    }
-    
+
     async startInterview() {
-        if (this.isInterviewActive) {
-            return;
-        }
-        
+        if (this.isInterviewActive) return;
+
         const jobRole = this.getSelectedJobRole();
-        this.updateJobTitle(jobRole);
-        
-        this.updateStatus('正在开始面试...');
-        this.startBtn.disabled = true;
-        
+        this.updateInterviewRoleBadge(jobRole);
+
+        this.toast('Starting interview...', 'info');
+        this.startInterviewBtn.disabled = true;
+
         try {
             const result = await apiClient.startInterview('', jobRole);
             this.currentSessionId = result.session_id;
             this.isInterviewActive = true;
-            
+
             this.showInterviewPanel();
-            this.hideJobSelect();
-            
-            this.endBtn.disabled = false;
-            this.enableRecording(false);
-            
-            this.hideReportButton();
             this.chatArea.innerHTML = '';
-            
+
+            this.endInterviewBtn.disabled = false;
+            this.hideReportButton();
+            this.enableRecording(false);
+
             this.addMessage('assistant', result.first_question);
             audioPlayer.speak(result.first_question);
-            
-            this.updateStatus('面试官正在说话，请稍等...');
-            
+
+            this.updateStatus('Interviewer is speaking...', 'thinking');
         } catch (error) {
-            console.error('开始面试失败:', error);
-            this.updateStatus('开始面试失败：' + (error.message || '请检查后端服务'), 'error');
-            this.startBtn.disabled = false;
+            console.error('Start interview failed:', error);
+            this.toast('Failed to start: ' + (error.message || 'Check backend'), 'error');
+            this.startInterviewBtn.disabled = false;
         }
     }
-    
+
     async toggleRecording() {
         if (!this.isInterviewActive) {
-            this.updateStatus('请先开始面试', 'error');
+            this.toast('Start the interview first', 'error');
             return;
         }
-        
         if (this.isRecording) {
             audioRecorder.stopListening();
         } else {
             audioPlayer.stop();
-            this.updateStatus('请开始说话...', 'info');
+            this.updateStatus('Listening...', 'speaking');
             var started = audioRecorder.startListening();
             if (started) {
                 this.isRecording = true;
-                this.recordBtn.textContent = '🔴 录音中... 点击停止';
-                this.recordBtn.classList.add('recording');
+                this.voiceBtn.classList.add('recording');
             } else {
-                this.updateStatus('无法启动麦克风，请检查权限', 'error');
+                this.updateStatus('Microphone unavailable', 'error');
             }
         }
     }
-    
+
     async handleUserInput(text) {
-        if (!this.isInterviewActive) {
-            this.updateStatus('面试未开始', 'error');
-            return;
-        }
-        
-        if (!text || text.trim() === '') {
-            this.updateStatus('未识别到有效内容，请重新说话', 'error');
-            this.enableRecording(true);
-            return;
-        }
-        
+        if (!this.isInterviewActive) { this.toast('No active interview', 'error'); return; }
+        if (!text || text.trim() === '') { this.toast('No speech recognized', 'error'); this.enableRecording(true); return; }
+
         this.addMessage('user', text);
         this.enableRecording(false);
-        this.updateStatus('正在处理您的回答...');
-        
+        this.updateStatus('Processing your answer...', 'thinking');
+
         try {
             const reply = await apiClient.sendMessage(text);
             this.addMessage('assistant', reply);
             audioPlayer.speak(reply);
         } catch (error) {
-            console.error('发送消息失败:', error);
-            this.updateStatus('发送失败，请重试', 'error');
+            console.error('Send failed:', error);
+            this.updateStatus('Send failed, please retry', 'error');
             this.enableRecording(true);
         }
     }
-    
+
     async sendManualMessage() {
         const text = this.manualInput.value.trim();
         if (!text) return;
-        
         this.manualInput.value = '';
         await this.handleUserInput(text);
     }
-    
+
     async endInterview() {
-        if (!this.isInterviewActive) {
-            return;
-        }
-        
-        this.updateStatus('正在结束面试，生成总结...');
+        if (!this.isInterviewActive) return;
+
+        this.updateStatus('Ending interview, generating summary...', 'thinking');
         this.enableRecording(false);
-        this.endBtn.disabled = true;
-        
+        this.endInterviewBtn.disabled = true;
+
         try {
             const summary = await apiClient.endInterview();
-            
-            this.addMessage(
-                'system',
-                '面试已结束。完整总结已生成，请点击下方「查看面试报告」查看。'
-            );
+            this.addMessage('system', 'Interview has ended. Click "View Report" to see the full summary.');
             this.showReportButton(summary);
-            
             this.isInterviewActive = false;
-            this.startBtn.disabled = false;
+            this.startInterviewBtn.disabled = false;
             this.currentSessionId = null;
-            
             await this.loadSavedResumeInfo();
-            this.updateStatus('面试已结束，可查看报告或开始新的面试');
+            this.updateStatus('Interview finished', 'idle');
             await this.loadHistoryToSidebar();
-            
         } catch (error) {
-            console.error('结束面试失败:', error);
-            this.updateStatus('结束面试失败', 'error');
-            this.endBtn.disabled = false;
+            console.error('End interview failed:', error);
+            this.toast('Failed to end interview', 'error');
+            this.endInterviewBtn.disabled = false;
         }
     }
-    
-    // ==================== UI辅助 ====================
-    
+
+    // ==================== UI 辅助 ====================
+
     addMessage(role, content) {
-        const messageDiv = document.createElement('div');
-        messageDiv.className = `message ${role}`;
-        
-        const roleSpan = document.createElement('span');
-        roleSpan.className = 'role';
-        
-        if (role === 'user') {
-            roleSpan.textContent = '👤 您';
-        } else if (role === 'assistant') {
-            roleSpan.textContent = '🎯 面试官';
-        } else {
-            roleSpan.textContent = '🤖 系统';
+        const wrapper = document.createElement('div');
+        wrapper.className = `msg-wrapper msg-${role}`;
+
+        if (role === 'assistant') {
+            const avatar = document.createElement('div');
+            avatar.className = 'msg-avatar';
+            avatar.textContent = 'AI';
+            wrapper.appendChild(avatar);
+        } else if (role === 'user') {
+            const avatar = document.createElement('div');
+            avatar.className = 'msg-avatar';
+            avatar.textContent = (apiClient.user?.username || 'U').charAt(0).toUpperCase();
+            wrapper.appendChild(avatar);
         }
-        
-        const contentP = document.createElement('p');
-        contentP.textContent = content;
-        
-        messageDiv.appendChild(roleSpan);
-        messageDiv.appendChild(contentP);
-        
-        this.chatArea.appendChild(messageDiv);
+
+        const body = document.createElement('div');
+        body.className = 'msg-body';
+
+        if (role !== 'system') {
+            const sender = document.createElement('div');
+            sender.className = 'msg-sender';
+            sender.textContent = role === 'assistant' ? 'Interviewer' : 'You';
+            body.appendChild(sender);
+        }
+
+        const bubble = document.createElement('div');
+        bubble.className = 'msg-bubble';
+        bubble.textContent = content;
+        body.appendChild(bubble);
+        wrapper.appendChild(body);
+
+        this.chatArea.appendChild(wrapper);
         this.chatArea.scrollTop = this.chatArea.scrollHeight;
     }
-    
+
     enableRecording(enabled) {
-        this.recordBtn.disabled = !enabled;
+        this.voiceBtn.disabled = !enabled;
         this.manualInput.disabled = !enabled;
         this.sendBtn.disabled = !enabled;
-        
         if (enabled) {
-            this.updateStatus('可以说话了，点击"按住说话"按钮进行语音输入');
-        } else {
-            this.updateStatus('面试官正在说话，请稍等...');
+            this.updateStatus('Waiting for your answer...', 'idle');
         }
     }
-    
-    updateStatus(message, type = 'info') {
-        if (this.status) {
-            this.status.textContent = message;
-            this.status.style.color = type === 'error' ? '#dc2626' : '#495057';
+
+    updateStatus(message, state) {
+        if (this.statusText) this.statusText.textContent = message;
+        if (this.statusDot) {
+            this.statusDot.className = 'interview-status-dot';
+            if (state === 'thinking' || state === 'speaking') this.statusDot.classList.add(state);
         }
     }
-    
+
+    toast(message, type) {
+        const container = document.getElementById('toast-container');
+        if (!container || !message) return;
+        const el = document.createElement('div');
+        el.className = 'toast-message';
+        el.textContent = message;
+        if (type === 'error') el.style.color = '#dc2626';
+        else if (type === 'success') el.style.color = '#059669';
+        container.appendChild(el);
+        setTimeout(() => { el.style.opacity = '0'; el.style.transition = 'opacity 0.3s ease'; setTimeout(() => el.remove(), 300); }, 1500);
+    }
+
+    updateInterviewRoleBadge(role) {
+        if (this.interviewRoleBadge) this.interviewRoleBadge.textContent = this.getRoleDisplayName(role);
+    }
+
     hideReportButton() {
         this.lastSummaryText = '';
-        if (this.summaryReportBody) {
-            this.summaryReportBody.innerHTML = '';
-        }
-        if (this.viewReportBtn) {
-            this.viewReportBtn.classList.add('btn-hidden');
-            this.viewReportBtn.disabled = true;
-        }
+        if (this.summaryReportBody) this.summaryReportBody.innerHTML = '';
+        if (this.viewReportBtn) { this.viewReportBtn.classList.add('btn-hidden'); this.viewReportBtn.disabled = true; }
         this.closeSummaryReportModal();
     }
-    
+
     showReportButton(summary) {
         this.lastSummaryText = summary != null ? String(summary) : '';
         if (this.summaryReportBody) {
@@ -924,199 +722,199 @@ class InterviewApp {
                 this.summaryReportBody.textContent = this.lastSummaryText;
             }
         }
-        if (this.viewReportBtn) {
-            this.viewReportBtn.classList.remove('btn-hidden');
-            this.viewReportBtn.disabled = false;
-        }
+        if (this.viewReportBtn) { this.viewReportBtn.classList.remove('btn-hidden'); this.viewReportBtn.disabled = false; }
     }
-    
+
     openSummaryReportModal() {
         if (!this.summaryReportModal || !this.summaryReportBody) return;
         const raw = this.lastSummaryText || '';
         if (typeof renderInterviewSummaryHtml === 'function') {
-            this.summaryReportBody.innerHTML = raw
-                ? renderInterviewSummaryHtml(raw)
-                : '<p class="report-empty">（暂无报告内容）</p>';
+            this.summaryReportBody.innerHTML = raw ? renderInterviewSummaryHtml(raw) : '<p class="report-empty">No report content available.</p>';
         } else {
-            this.summaryReportBody.textContent = raw || '（暂无报告内容）';
+            this.summaryReportBody.textContent = raw || 'No report content available.';
         }
         this.summaryReportModal.style.display = 'block';
     }
-    
+
     closeSummaryReportModal() {
-        if (this.summaryReportModal) {
-            this.summaryReportModal.style.display = 'none';
-        }
+        if (this.summaryReportModal) this.summaryReportModal.style.display = 'none';
     }
-    
+
     downloadSummaryPdf() {
-        if (typeof html2pdf === 'undefined') {
-            this.updateStatus('PDF 组件未加载，请检查网络后刷新页面重试', 'error');
-            return;
-        }
+        if (typeof html2pdf === 'undefined') { this.toast('PDF module not loaded. Refresh and try again.', 'error'); return; }
         const el = this.summaryReportBody;
-        if (!el || !String(el.textContent || '').trim()) {
-            this.updateStatus('没有可下载的报告内容', 'error');
-            return;
-        }
-        
-        const filename = `面试总结报告_${new Date().toISOString().slice(0, 10)}.pdf`;
+        if (!el || !String(el.textContent || '').trim()) { this.toast('No report content to download', 'error'); return; }
+
+        const filename = `Interview_Report_${new Date().toISOString().slice(0, 10)}.pdf`;
         const opt = {
-            margin: 12,
-            filename,
-            image: { type: 'jpeg', quality: 0.92 },
+            margin: 12, filename, image: { type: 'jpeg', quality: 0.92 },
             html2canvas: { scale: 2, useCORS: true, logging: false },
             jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
             pagebreak: { mode: ['avoid-all', 'css', 'legacy'] },
         };
-        
-        const prevMax = el.style.maxHeight;
-        const prevOv = el.style.overflow;
-        el.style.maxHeight = 'none';
-        el.style.overflow = 'visible';
-        
-        const restore = () => {
-            el.style.maxHeight = prevMax;
-            el.style.overflow = prevOv;
-        };
-        
+        const prevMax = el.style.maxHeight, prevOv = el.style.overflow;
+        el.style.maxHeight = 'none'; el.style.overflow = 'visible';
+        const restore = () => { el.style.maxHeight = prevMax; el.style.overflow = prevOv; };
         const p = html2pdf().set(opt).from(el).save();
-        if (p && typeof p.finally === 'function') {
-            p.finally(restore);
-        } else if (p && typeof p.then === 'function') {
-            p.then(restore).catch(restore);
-        } else {
-            setTimeout(restore, 1500);
-        }
+        if (p && typeof p.finally === 'function') p.finally(restore);
+        else if (p && typeof p.then === 'function') p.then(restore).catch(restore);
+        else setTimeout(restore, 1500);
     }
-    
-    deleteCurrentHistory() {
-        if (!this.currentDetailSessionId) return;
-        this.pendingDeleteSessionId = this.currentDetailSessionId;
-        this.openDeleteConfirmModal();
-    }
-    
-    openDeleteConfirmModal() {
-        if (this.deleteConfirmModal) {
-            this.deleteConfirmModal.style.display = 'block';
-        }
-    }
-    
-    closeDeleteConfirmModal() {
-        if (this.deleteConfirmModal) {
-            this.deleteConfirmModal.style.display = 'none';
-        }
-        this.pendingDeleteSessionId = null;
-    }
-    
-    openClearResumeModal() {
-        if (this.clearResumeModal) {
-            this.clearResumeModal.style.display = 'block';
-        }
-    }
-    
-    closeClearResumeModal() {
-        if (this.clearResumeModal) {
-            this.clearResumeModal.style.display = 'none';
-        }
-    }
-    
-    async confirmClearResume() {
-        this.closeClearResumeModal();
+
+    // ==================== 历史详情 ====================
+
+    async showHistoryDetail(sessionId) {
         try {
-            await apiClient.deleteResume();
-            await this.loadSavedResumeInfo();
-            if (this.resumeHint) {
-                this.resumeHint.textContent = '支持 PDF、Word（.docx）';
+            const interview = await apiClient.getInterviewDetail(sessionId);
+            this.currentDetailSessionId = sessionId;
+            this.showDetailPanel();
+
+            const role = this.getRoleDisplayName(interview.job_role || 'java_backend');
+            this.detailTitle.textContent = `${role} — ${this.formatDate(interview.created_at)}`;
+
+            let html = '<div class="detail-messages">';
+            interview.messages.forEach(msg => {
+                const senderName = msg.role === 'user' ? 'You' : 'Interviewer';
+                const avatarChar = msg.role === 'user'
+                    ? ((apiClient.user?.username || 'U').charAt(0).toUpperCase())
+                    : 'AI';
+                const roleClass = msg.role === 'user' ? 'msg-user' : 'msg-assistant';
+                html += `
+                    <div class="msg-wrapper ${roleClass}">
+                        <div class="msg-avatar">${avatarChar}</div>
+                        <div class="msg-body">
+                            <div class="msg-sender">${senderName}</div>
+                            <div class="msg-bubble">${msg.content.replace(/</g, '&lt;').replace(/>/g, '&gt;')}</div>
+                        </div>
+                    </div>`;
+            });
+            html += '</div>';
+
+            if (interview.summary) {
+                html += `
+                    <div class="detail-summary-card">
+                        <h3>Interview Summary Report</h3>
+                        <button class="btn-view-report" onclick="app.viewHistoryReport('${sessionId}')">View Full Report</button>
+                    </div>`;
             }
-            if (this.resumeFileInput) {
-                this.resumeFileInput.value = '';
-            }
-            this.updateStatus('简历已清除', 'info');
+
+            this.detailContent.innerHTML = html;
+            this.loadHistoryToSidebar();
         } catch (error) {
-            console.error('清除简历失败:', error);
-            this.updateStatus('清除简历失败', 'error');
+            console.error('Load detail failed:', error);
+            this.toast('Failed to load interview detail', 'error');
         }
     }
-    
+
+    async viewHistoryReport(sessionId) {
+        try {
+            const interview = await apiClient.getInterviewDetail(sessionId);
+            if (interview && interview.summary) {
+                this.showReportButton(interview.summary);
+                this.openSummaryReportModal();
+            } else {
+                this.toast('No report found', 'error');
+            }
+        } catch (error) {
+            console.error('Load report failed:', error);
+            this.toast('Failed to load report', 'error');
+        }
+    }
+
+    // ==================== 弹窗操作 ====================
+
+    openDeleteConfirmModal() { if (this.deleteConfirmModal) this.deleteConfirmModal.style.display = 'block'; }
+    closeDeleteConfirmModal() { if (this.deleteConfirmModal) this.deleteConfirmModal.style.display = 'none'; this.pendingDeleteSessionId = null; }
+
     async confirmDelete() {
         const sessionId = this.pendingDeleteSessionId;
         this.closeDeleteConfirmModal();
-        
         try {
             const result = await apiClient.deleteInterview(sessionId);
-            
             if (result.success) {
-                if (this.currentDetailSessionId === sessionId) {
-                    this.showInterviewPanel();
-                }
+                if (this.currentDetailSessionId === sessionId) this.showWelcomePanel();
                 await this.loadHistoryToSidebar();
-                this.updateStatus('面试记录已删除', 'info');
+                this.toast('Interview record deleted', 'info');
             } else {
-                this.updateStatus(result.message, 'error');
+                this.toast(result.message, 'error');
             }
         } catch (error) {
-            console.error('删除失败:', error);
-            this.updateStatus('删除失败', 'error');
+            console.error('Delete failed:', error);
+            this.toast('Delete failed', 'error');
         }
     }
-    
+
     formatDate(dateStr) {
         const date = new Date(dateStr);
-        const year = date.getFullYear();
-        const month = String(date.getMonth() + 1).padStart(2, '0');
-        const day = String(date.getDate()).padStart(2, '0');
-        const hours = String(date.getHours()).padStart(2, '0');
-        const minutes = String(date.getMinutes()).padStart(2, '0');
-        return `${year}-${month}-${day} ${hours}:${minutes}`;
+        const y = date.getFullYear();
+        const mo = String(date.getMonth() + 1).padStart(2, '0');
+        const d = String(date.getDate()).padStart(2, '0');
+        const h = String(date.getHours()).padStart(2, '0');
+        const mi = String(date.getMinutes()).padStart(2, '0');
+        return `${y}-${mo}-${d} ${h}:${mi}`;
     }
-    
-    // ==================== 简历管理 ====================
-    
-    async loadSavedResumeInfo() {
-        if (!apiClient.isAuthenticated()) return;
-        
-        try {
-            const info = await apiClient.getResumeInfo();
-            this.updateResumeStatus(info);
-        } catch (error) {
-            console.error('加载保存的简历信息失败:', error);
-            this.updateResumeStatus(null);
-        }
-    }
-    
-    async saveResumeToServer(text, filename = '') {
-        try {
-            await apiClient.saveResume(text, filename);
-            await this.loadSavedResumeInfo();
-        } catch (error) {
-            console.error('保存简历失败:', error);
-            throw error;
-        }
-    }
-    
-    updateResumeStatus(info) {
-        if (!this.resumeStatusText) return;
-        
-        if (info && info.exists) {
-            const name = info.filename || '简历';
-            const count = info.char_count || 0;
-            this.resumeStatusText.textContent = `${name}（${count}字）`;
-            this.resumeStatusText.style.color = '#10b981';
-            
-            if (this.clearResumeBtn) {
-                this.clearResumeBtn.classList.remove('btn-hidden');
-                this.clearResumeBtn.disabled = false;
-            }
-        } else {
-            this.resumeStatusText.textContent = '未上传';
-            this.resumeStatusText.style.color = '#6b7280';
-            
-            if (this.clearResumeBtn) {
-                this.clearResumeBtn.classList.add('btn-hidden');
-                this.clearResumeBtn.disabled = true;
-            }
-        }
+
+    // ==================== 初始化 ====================
+
+    init() {
+        this.initRoleSelector();
+
+        // 侧边栏
+        this.sidebarToggle?.addEventListener('click', () => this.toggleSidebar());
+        this.sidebarExpandBtn?.addEventListener('click', () => this.toggleSidebar());
+        this.newInterviewBtn?.addEventListener('click', () => this.onNewInterviewClick());
+
+        // 简历
+        this.resumeFileInput?.addEventListener('change', (e) => this.onResumeFileSelected(e));
+        this.resumeClearBtn?.addEventListener('click', () => this.openClearResumeModal());
+
+        // 面试控制
+        this.startInterviewBtn?.addEventListener('click', () => this.startInterview());
+        this.voiceBtn?.addEventListener('click', () => this.toggleRecording());
+        this.endInterviewBtn?.addEventListener('click', () => this.endInterview());
+        this.sendBtn?.addEventListener('click', () => this.sendManualMessage());
+        this.manualInput?.addEventListener('keypress', (e) => { if (e.key === 'Enter') this.sendManualMessage(); });
+
+        // 详情面板
+        this.detailBackBtn?.addEventListener('click', () => this.showWelcomePanel());
+        this.detailDeleteBtn?.addEventListener('click', () => {
+            if (!this.currentDetailSessionId) return;
+            this.pendingDeleteSessionId = this.currentDetailSessionId;
+            this.openDeleteConfirmModal();
+        });
+
+        // 报告
+        this.viewReportBtn?.addEventListener('click', () => this.openSummaryReportModal());
+        this.summaryDownloadPdfBtn?.addEventListener('click', () => this.downloadSummaryPdf());
+        this.summaryModalCloseBtn?.addEventListener('click', () => this.closeSummaryReportModal());
+        this.closeSummarySpan?.addEventListener('click', () => this.closeSummaryReportModal());
+
+        // 删除弹窗
+        this.deleteCancelBtn?.addEventListener('click', () => this.closeDeleteConfirmModal());
+        this.deleteConfirmBtn?.addEventListener('click', () => this.confirmDelete());
+        this.closeDeleteBtn?.addEventListener('click', () => this.closeDeleteConfirmModal());
+
+        // 清除简历弹窗
+        this.clearResumeCancelBtn?.addEventListener('click', () => this.closeClearResumeModal());
+        this.clearResumeConfirmBtn?.addEventListener('click', () => this.confirmClearResume());
+        this.closeClearResumeBtn?.addEventListener('click', () => this.closeClearResumeModal());
+
+        // 音频回调
+        audioRecorder.onResult = (text) => this.handleUserInput(text);
+        audioRecorder.onError = (error) => {
+            this.updateStatus('Speech recognition error', 'error');
+            this.isRecording = false;
+            this.voiceBtn.classList.remove('recording');
+        };
+        audioRecorder.onEnd = () => {
+            this.isRecording = false;
+            this.voiceBtn.classList.remove('recording');
+        };
+        audioPlayer.onStart = () => { this.updateStatus('Interviewer is speaking...', 'speaking'); };
+        audioPlayer.onEnd = () => {
+            this.updateStatus('Waiting for your answer...', 'idle');
+            if (this.isInterviewActive) this.enableRecording(true);
+        };
     }
 }
 
